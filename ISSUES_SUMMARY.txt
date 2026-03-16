@@ -1,0 +1,173 @@
+GITHUB ISSUES TO CREATE FOR TEST COVERAGE IMPROVEMENT
+======================================================
+
+The following 15 GitHub issues should be created to improve test coverage from 81.9% to 90%+:
+
+CRITICAL COVERAGE GAPS (0% Coverage) - 3 Issues
+================================================
+
+1. Test EdDSA Signing Algorithm
+   Title: Add test coverage for EdDSA JWT signing (signEdDSA function)
+   Labels: test, coverage, high-priority
+   Files: internal/jwt/sign.go:208, internal/jwt/sign_test.go
+   Estimated Gain: +1.2%
+   
+2. Test Clipboard CommandFunc on Different Platforms
+   Title: Add test coverage for clipboard.CommandFunc across all OS platforms
+   Labels: test, coverage, high-priority
+   Files: internal/clipboard/clipboard.go:12, cmd/jwx/commands/commands_test.go
+   Estimated Gain: +0.5%
+   
+3. Test main() Entry Point
+   Title: Add test coverage for main() entry point
+   Labels: test, coverage
+   Files: cmd/jwx/main.go:17, cmd/jwx/main_test.go (new)
+   Estimated Gain: +0.3%
+
+
+HIGH PRIORITY COVERAGE GAPS (26-90% Coverage) - 12 Issues
+===========================================================
+
+4. Test Execute Function Error Handling
+   Title: Add test coverage for Execute() function error paths
+   Labels: test, coverage, high-priority
+   Files: cmd/jwx/commands/root.go:44, cmd/jwx/commands/commands_test.go
+   Current Coverage: 26.3%
+   Estimated Gain: +1.0%
+
+5. Test runDecode Stdin and Expiration Handling
+   Title: Add test coverage for runDecode stdin input and expired token exit code
+   Labels: test, coverage
+   Files: cmd/jwx/commands/decode.go:39, cmd/jwx/commands/commands_test.go
+   Current Coverage: 84.6%
+   Estimated Gain: +0.8%
+
+6. Test signECDSA with ES384 and ES512 Algorithms
+   Title: Add test coverage for signECDSA with ES384 and ES512
+   Labels: test, coverage
+   Files: internal/jwt/sign.go:154, internal/jwt/sign_test.go
+   Current Coverage: 78.1%
+   Estimated Gain: +0.8%
+
+7. Test signRSA with RS384 and RS512 Algorithms
+   Title: Add test coverage for signRSA with RS384 and RS512
+   Labels: test, coverage
+   Files: internal/jwt/sign.go:118, internal/jwt/sign_test.go
+   Current Coverage: 76.2%
+   Estimated Gain: +0.6%
+
+8. Test extractTime with json.Number Type
+   Title: Add test coverage for extractTime() with json.Number values
+   Labels: test, coverage
+   Files: internal/jwt/decode.go:77, internal/jwt/decode_test.go
+   Current Coverage: 50.0%
+   Estimated Gain: +0.5%
+
+9. Test Sign with Edge Cases
+   Title: Add test coverage for Sign() with JSON encoding edge cases
+   Labels: test, coverage
+   Files: internal/jwt/sign.go:39, internal/jwt/sign_test.go
+   Current Coverage: 86.2%
+   Estimated Gain: +0.5%
+
+10. Test decodeSegment Error Handling
+    Title: Add test coverage for decodeSegment() base64 decode errors
+    Labels: test, coverage
+    Files: internal/jwt/decode.go:63, internal/jwt/decode_test.go
+    Current Coverage: 85.7%
+    Estimated Gain: +0.4%
+
+11. Test runSign Error Handling
+    Title: Add test coverage for runSign() error handling
+    Labels: test, coverage
+    Files: cmd/jwx/commands/sign.go:44, cmd/jwx/commands/commands_test.go
+    Current Coverage: 92.3%
+    Estimated Gain: +0.3%
+
+12. Test Decode with Invalid Part Count
+    Title: Add test coverage for Decode() with incorrect number of JWT parts
+    Labels: test, coverage
+    Files: internal/jwt/decode.go:24, internal/jwt/decode_test.go
+    Current Coverage: 89.5%
+    Estimated Gain: +0.3%
+
+13. Test RenderJSON Error Handling
+    Title: Add test coverage for RenderJSON() JSON marshaling errors
+    Labels: test, coverage
+    Files: internal/display/json.go:18, internal/display/json_test.go
+    Current Coverage: 80.0%
+    Estimated Gain: +0.3%
+
+14. Test signHMAC with All Algorithms
+    Title: Add test coverage for signHMAC with HS384 and HS512
+    Labels: test, coverage
+    Files: internal/jwt/sign.go:96, internal/jwt/sign_test.go
+    Current Coverage: 90.9%
+    Estimated Gain: +0.2%
+
+15. Test formatValue with Unmapped Types
+    Title: Add test coverage for formatValue() default case
+    Labels: test, coverage
+    Files: internal/display/render.go:192, internal/display/render_test.go
+    Current Coverage: 87.5%
+    Estimated Gain: +0.3%
+
+
+SUMMARY STATISTICS
+==================
+Total Issues: 15
+Critical (0% coverage): 3 issues
+High Priority (<90% coverage): 12 issues
+Total Estimated Coverage Gain: +9.1%
+Projected Final Coverage: 90.8%+
+Estimated Implementation Time: 8-12 hours
+
+TEST FILES TO MODIFY
+====================
+1. /Users/mani/Documents/Projects/jwx/internal/jwt/sign_test.go (largest changes)
+2. /Users/mani/Documents/Projects/jwx/internal/jwt/decode_test.go
+3. /Users/mani/Documents/Projects/jwx/cmd/jwx/commands/commands_test.go
+4. /Users/mani/Documents/Projects/jwx/internal/display/render_test.go
+5. /Users/mani/Documents/Projects/jwx/internal/display/json_test.go
+6. /Users/mani/Documents/Projects/jwx/cmd/jwx/main_test.go (new file, optional)
+
+IMPLEMENTATION STRATEGY
+=======================
+Phase 1 (Priority 1 - +3.8%):
+  - Issues 1, 4, 6, 5
+  - Add EdDSA, Execute(), ES384/ES512, stdin tests
+  
+Phase 2 (Priority 2 - +3.0%):
+  - Issues 7, 8, 2, 10, 11
+  - Add RS384/RS512, json.Number, CommandFunc, error paths
+  
+Phase 3 (Priority 3 - +2.3%):
+  - Issues 9, 3, 12, 13, 14, 15
+  - Edge cases and polish
+
+COVERAGE BREAKDOWN BY FILE
+==========================
+File: internal/display/
+  - Current: 98.1%
+  - Status: Excellent
+  - Issues: 13, 15
+
+File: internal/jwt/
+  - Current: 80.9%
+  - Status: Good but needs algorithm variants
+  - Issues: 1, 6, 7, 8, 9, 10, 12, 14
+
+File: cmd/jwx/commands/
+  - Current: 71.6%
+  - Status: Needs improvement
+  - Issues: 2, 4, 5, 11
+
+File: cmd/jwx/
+  - Current: 0.0%
+  - Status: Main entry point untested
+  - Issues: 3
+
+File: internal/clipboard/
+  - Current: 0.0%
+  - Status: Platform-specific code untested
+  - Issues: 2

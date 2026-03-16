@@ -21,26 +21,64 @@
 
 ## Install
 
+> **Works everywhere:** If you have Go 1.21+, the fastest way to install on any platform:
+>
+> ```bash
+> go install github.com/manimovassagh/jwx/cmd/jwx@latest
+> ```
+
+### macOS
+
+**Homebrew** (recommended):
+
 ```bash
-# Go (recommended)
-go install github.com/manimovassagh/jwx/cmd/jwx@latest
-
-# Homebrew (macOS/Linux)
 brew install manimovassagh/tap/jwx
-
-# Download binary (Linux, macOS, Windows)
-# → https://github.com/manimovassagh/jwx/releases/latest
 ```
 
-### Other platforms
+Or with Go:
 
-| Platform | Command |
-|----------|---------|
-| **Go** | `go install github.com/manimovassagh/jwx/cmd/jwx@latest` |
-| **Homebrew** | `brew install manimovassagh/tap/jwx` |
-| **Binary** | Download from [Releases](https://github.com/manimovassagh/jwx/releases/latest) |
-| **Docker** | `docker run --rm ghcr.io/manimovassagh/jwx decode <token>` |
-| **From source** | `git clone && make install` |
+```bash
+go install github.com/manimovassagh/jwx/cmd/jwx@latest
+```
+
+### Linux
+
+**Go install:**
+
+```bash
+go install github.com/manimovassagh/jwx/cmd/jwx@latest
+```
+
+**Pre-built binary:**
+
+```bash
+# Download the latest release for your architecture
+curl -sL https://github.com/manimovassagh/jwx/releases/latest/download/jwx_linux_amd64.tar.gz | tar xz
+sudo mv jwx /usr/local/bin/
+```
+
+> **Snap / APT** — coming soon.
+
+### Windows
+
+**Go install:**
+
+```powershell
+go install github.com/manimovassagh/jwx/cmd/jwx@latest
+```
+
+**Pre-built binary:** download `.exe` from [Releases](https://github.com/manimovassagh/jwx/releases/latest) and add to your `PATH`.
+
+> **Scoop** — coming soon.
+
+### From Source
+
+```bash
+git clone https://github.com/manimovassagh/jwx.git
+cd jwx
+make build
+make install
+```
 
 ## Shell Completions
 
@@ -61,26 +99,17 @@ jwx completion powershell | Out-String | Invoke-Expression
 ## Quick Start
 
 ```bash
-# Decode a token
+# Decode any JWT with colorized output
 jwx decode eyJhbGciOiJIUzI1NiIs...
 
-# Pipe from clipboard (macOS)
+# Pipe from clipboard or stdin
 pbpaste | jwx decode
-
-# Pipe from environment variable
-echo $JWT_TOKEN | jwx decode
-
-# JSON output for scripting
-jwx decode --json eyJhbGci... | jq .payload.sub
 
 # Sign a new token
 jwx sign --alg HS256 --secret mykey '{"sub":"1234","role":"admin"}'
 
-# Sign with RSA key
-jwx sign --alg RS256 --key private.pem '{"sub":"1234"}'
-
-# Sign from a file
-jwx sign --alg HS256 --secret mykey --from claims.json
+# Machine-readable output for scripts
+jwx decode --json eyJhbGci... | jq .payload.sub
 ```
 
 ## Features

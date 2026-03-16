@@ -3,70 +3,156 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>jwx - JWT Decoder</title>
-<meta name="description" content="Decode JSON Web Tokens instantly in your browser. Free, open-source, client-side JWT decoder with beautiful dark UI.">
-<meta name="keywords" content="JWT, JSON Web Token, decoder, debugger, base64, token, auth, OAuth">
-<meta property="og:title" content="jwx - JWT Decoder">
-<meta property="og:description" content="Decode JSON Web Tokens instantly in your browser. Free, open-source, client-side only.">
+<title>jwx - JWT Decoder & Inspector</title>
+<meta name="description" content="Decode JSON Web Tokens instantly in your browser or terminal. Free, open-source, privacy-first JWT decoder with beautiful output.">
+<meta name="keywords" content="JWT, JSON Web Token, decoder, debugger, base64, token, auth, OAuth, CLI">
+<meta property="og:title" content="jwx - JWT Decoder & Inspector">
+<meta property="og:description" content="Decode JSON Web Tokens instantly in your browser or terminal. Free, open-source, privacy-first.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://manimovassagh.github.io/jwx/">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="jwx - JWT Decoder">
-<meta name="twitter:description" content="Decode JSON Web Tokens instantly in your browser. Free, open-source, client-side only.">
+<meta property="og:image" content="https://manimovassagh.github.io/jwx/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="jwx - JWT Decoder & Inspector">
+<meta name="twitter:description" content="Decode JSON Web Tokens instantly in your browser or terminal. Free, open-source, privacy-first.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔑</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#0d1117;--card:#161b22;--border:#30363d;--text:#e6edf3;--muted:#8b949e;
-  --blue:#58a6ff;--green:#3fb950;--yellow:#d29922;--red:#f85149;
+  --bg:#0d1117;--bg-alt:#0a0e14;--card:#161b22;--card-hover:#1c2129;
+  --border:#30363d;--border-light:#3d444d;--text:#e6edf3;--muted:#8b949e;
+  --blue:#58a6ff;--green:#3fb950;--yellow:#d29922;--red:#f85149;--purple:#bc8cff;
   --font-sans:'Inter',system-ui,-apple-system,sans-serif;
   --font-mono:'JetBrains Mono','Fira Code',monospace;
 }
-html{font-size:16px}
-body{background:var(--bg);color:var(--text);font-family:var(--font-sans);line-height:1.6;min-height:100vh;display:flex;flex-direction:column}
-a{color:var(--blue);text-decoration:none}
-a:hover{text-decoration:underline}
+html{font-size:16px;scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--font-sans);line-height:1.6;min-height:100vh;overflow-x:hidden}
+a{color:var(--blue);text-decoration:none;transition:color .2s}
+a:hover{color:#79bbff;text-decoration:underline}
 
-.container{max-width:900px;margin:0 auto;padding:0 1.25rem;width:100%}
+.container{max-width:960px;margin:0 auto;padding:0 1.5rem;width:100%}
 
-/* Header */
-header{padding:3rem 0 2rem;text-align:center}
-.logo{font-size:3.5rem;font-weight:700;font-family:var(--font-mono);background:linear-gradient(135deg,var(--blue),var(--green));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:-0.04em;margin-bottom:0.25rem}
-.tagline{color:var(--muted);font-size:1.05rem;margin-bottom:1.5rem}
+/* ─── Animations ─── */
+@keyframes fadeUp{
+  from{opacity:0;transform:translateY(30px)}
+  to{opacity:1;transform:translateY(0)}
+}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes shimmer{
+  0%{background-position:200% center}
+  100%{background-position:-200% center}
+}
+@keyframes pulseGlow{
+  0%,100%{box-shadow:0 0 20px rgba(88,166,255,0.1)}
+  50%{box-shadow:0 0 40px rgba(88,166,255,0.2)}
+}
+.fade-up{animation:fadeUp .8s ease-out both}
+.fade-up-d1{animation-delay:.1s}
+.fade-up-d2{animation-delay:.2s}
+.fade-up-d3{animation-delay:.3s}
+.fade-up-d4{animation-delay:.4s}
+.fade-in{animation:fadeIn .6s ease-out both}
+
+/* ─── Hero ─── */
+.hero{padding:6rem 0 4rem;text-align:center;position:relative;overflow:hidden}
+.hero::before{
+  content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;
+  background:radial-gradient(circle at 50% 50%,rgba(88,166,255,0.06) 0%,transparent 50%);
+  pointer-events:none;
+}
+.hero-logo{
+  font-size:5rem;font-weight:800;font-family:var(--font-mono);
+  background:linear-gradient(135deg,var(--blue),var(--green),var(--purple));
+  background-size:200% 200%;
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  letter-spacing:-0.06em;margin-bottom:0.75rem;
+  animation:shimmer 6s linear infinite;
+}
+.hero-tagline{
+  color:var(--muted);font-size:1.2rem;max-width:520px;margin:0 auto 2rem;
+  line-height:1.6;
+}
+.hero-buttons{display:flex;gap:0.75rem;justify-content:center;flex-wrap:wrap;margin-bottom:2rem}
+.btn{
+  cursor:pointer;border:none;border-radius:10px;font-family:var(--font-sans);
+  font-size:0.9rem;font-weight:600;padding:0.75rem 1.75rem;transition:all .2s;
+  display:inline-flex;align-items:center;gap:0.5rem;text-decoration:none;
+}
+.btn-primary{
+  background:linear-gradient(135deg,var(--blue),#3b82f6);color:#fff;
+  box-shadow:0 4px 16px rgba(88,166,255,0.25);
+}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(88,166,255,0.35);text-decoration:none;color:#fff}
+.btn-outline{
+  background:transparent;color:var(--text);
+  border:1px solid var(--border);
+}
+.btn-outline:hover{border-color:var(--muted);background:var(--card);text-decoration:none;color:var(--text);transform:translateY(-2px)}
 .badge-row{display:flex;gap:0.5rem;justify-content:center;flex-wrap:wrap}
-.badge-row a img{height:20px}
+.badge-row a img{height:20px;transition:opacity .2s}
+.badge-row a:hover img{opacity:0.8}
 
-/* Input area */
-.input-section{margin-bottom:1.5rem}
-.input-section label{display:block;font-weight:600;margin-bottom:0.5rem;font-size:0.9rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em}
-.input-wrap{position:relative}
-textarea{width:100%;min-height:120px;background:var(--card);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:var(--font-mono);font-size:0.85rem;padding:1rem;resize:vertical;outline:none;transition:border-color .2s}
+/* ─── Decoder Section ─── */
+.decoder-section{padding:2rem 0 4rem}
+.decoder-title{
+  font-size:1.5rem;font-weight:700;margin-bottom:1.5rem;text-align:center;
+  color:var(--text);
+}
+.decoder-title span{color:var(--blue)}
+.input-card{
+  background:var(--card);border:1px solid var(--border);border-radius:14px;
+  padding:1.5rem;margin-bottom:1.5rem;transition:border-color .3s;
+}
+.input-card:focus-within{border-color:var(--blue);animation:pulseGlow 2s ease-in-out infinite}
+.input-label{
+  display:block;font-weight:600;margin-bottom:0.75rem;font-size:0.8rem;
+  color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;
+}
+textarea{
+  width:100%;min-height:130px;background:var(--bg);border:1px solid var(--border);
+  border-radius:10px;color:var(--text);font-family:var(--font-mono);font-size:0.85rem;
+  padding:1rem;resize:vertical;outline:none;transition:border-color .2s;
+}
 textarea:focus{border-color:var(--blue)}
-textarea::placeholder{color:var(--muted)}
-.btn-row{display:flex;gap:0.5rem;margin-top:0.75rem}
-button{cursor:pointer;border:none;border-radius:8px;font-family:var(--font-sans);font-size:0.85rem;font-weight:600;padding:0.5rem 1.25rem;transition:all .15s}
-.btn-primary{background:var(--blue);color:#fff}
-.btn-primary:hover{opacity:0.85}
-.btn-secondary{background:var(--border);color:var(--text)}
-.btn-secondary:hover{background:#3d444d}
-.btn-copy{background:transparent;border:1px solid var(--border);color:var(--muted);padding:0.3rem 0.7rem;font-size:0.75rem;border-radius:6px}
-.btn-copy:hover{border-color:var(--muted);color:var(--text)}
+textarea::placeholder{color:#4a5568}
+.btn-row{display:flex;gap:0.5rem;margin-top:1rem;flex-wrap:wrap}
+.btn-sm{
+  cursor:pointer;border:none;border-radius:8px;font-family:var(--font-sans);
+  font-size:0.82rem;font-weight:600;padding:0.55rem 1.25rem;transition:all .15s;
+}
+.btn-decode{background:var(--blue);color:#fff}
+.btn-decode:hover{opacity:0.85}
+.btn-clear{background:var(--border);color:var(--text)}
+.btn-clear:hover{background:var(--border-light)}
+.btn-sample{background:transparent;border:1px solid var(--border);color:var(--muted)}
+.btn-sample:hover{border-color:var(--muted);color:var(--text)}
 
 /* Status */
-.status-bar{display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap;margin-bottom:1.5rem;min-height:1.75rem}
-.alg-badge,.expiry-badge{display:inline-flex;align-items:center;padding:0.2rem 0.65rem;border-radius:20px;font-size:0.75rem;font-weight:600;font-family:var(--font-mono)}
-.alg-badge{background:rgba(88,166,255,0.15);color:var(--blue);border:1px solid rgba(88,166,255,0.3)}
-.expiry-badge.valid{background:rgba(63,185,80,0.15);color:var(--green);border:1px solid rgba(63,185,80,0.3)}
-.expiry-badge.expired{background:rgba(248,81,73,0.15);color:var(--red);border:1px solid rgba(248,81,73,0.3)}
+.status-bar{display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap;margin-bottom:1.5rem;min-height:0}
+.status-bar:empty{margin-bottom:0}
+.alg-badge,.expiry-badge{
+  display:inline-flex;align-items:center;padding:0.25rem 0.75rem;border-radius:20px;
+  font-size:0.75rem;font-weight:600;font-family:var(--font-mono);
+}
+.alg-badge{background:rgba(88,166,255,0.12);color:var(--blue);border:1px solid rgba(88,166,255,0.25)}
+.expiry-badge.valid{background:rgba(63,185,80,0.12);color:var(--green);border:1px solid rgba(63,185,80,0.25)}
+.expiry-badge.expired{background:rgba(248,81,73,0.12);color:var(--red);border:1px solid rgba(248,81,73,0.25)}
 
 /* Decoded sections */
 .decoded{display:none}
-.decoded.show{display:block}
-.section{background:var(--card);border-radius:10px;border:1px solid var(--border);margin-bottom:1rem;overflow:hidden}
-.section-header{display:flex;align-items:center;justify-content:space-between;padding:0.65rem 1rem;border-bottom:1px solid var(--border)}
+.decoded.show{display:block;animation:fadeUp .4s ease-out}
+.section{
+  background:var(--card);border-radius:12px;border:1px solid var(--border);
+  margin-bottom:1rem;overflow:hidden;transition:border-color .2s;
+}
+.section:hover{border-color:var(--border-light)}
+.section-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0.75rem 1.25rem;border-bottom:1px solid var(--border);
+  background:rgba(255,255,255,0.02);
+}
 .section-label{font-weight:600;font-size:0.85rem;display:flex;align-items:center;gap:0.5rem}
 .section-dot{width:10px;height:10px;border-radius:50%;display:inline-block}
 .section.header-section{border-left:3px solid var(--blue)}
@@ -75,61 +161,169 @@ button{cursor:pointer;border:none;border-radius:8px;font-family:var(--font-sans)
 .section.payload-section .section-dot{background:var(--green)}
 .section.signature-section{border-left:3px solid var(--yellow)}
 .section.signature-section .section-dot{background:var(--yellow)}
-.section-body{padding:1rem;overflow-x:auto}
-pre{font-family:var(--font-mono);font-size:0.82rem;line-height:1.7;white-space:pre-wrap;word-break:break-all}
+.section-body{padding:1.25rem;overflow-x:auto}
+pre{font-family:var(--font-mono);font-size:0.82rem;line-height:1.8;white-space:pre-wrap;word-break:break-all}
+
+/* Copy button */
+.btn-copy{
+  cursor:pointer;background:transparent;border:1px solid var(--border);
+  color:var(--muted);padding:0.3rem 0.75rem;font-size:0.75rem;border-radius:6px;
+  font-family:var(--font-sans);font-weight:500;transition:all .15s;
+  min-width:62px;text-align:center;
+}
+.btn-copy:hover{border-color:var(--muted);color:var(--text)}
+.btn-copy.copied{border-color:var(--green);color:var(--green);background:rgba(63,185,80,0.08)}
 
 /* JSON highlighting */
 .json-key{color:var(--blue)}
 .json-string{color:var(--green)}
 .json-number{color:var(--yellow)}
-.json-bool,.json-null{color:#bc8cff}
-.json-ts{color:var(--muted);font-size:0.78rem;font-style:italic}
+.json-bool,.json-null{color:var(--purple)}
+.json-ts{color:var(--muted);font-size:0.75rem;font-style:italic;display:inline-flex;align-items:center;gap:0.35rem}
+.json-ts::before{content:'';display:inline-block;width:12px;height:1px;background:var(--border)}
 
 /* Error */
-.error-msg{background:rgba(248,81,73,0.1);border:1px solid rgba(248,81,73,0.3);border-radius:10px;padding:1rem;color:var(--red);font-size:0.9rem;margin-bottom:1rem;display:none}
-.error-msg.show{display:block}
+.error-msg{
+  background:rgba(248,81,73,0.08);border:1px solid rgba(248,81,73,0.25);
+  border-radius:10px;padding:1rem 1.25rem;color:var(--red);font-size:0.9rem;
+  margin-bottom:1rem;display:none;
+}
+.error-msg.show{display:flex;align-items:center;gap:0.5rem;animation:fadeIn .3s}
+.error-msg::before{content:'!';font-weight:700;background:var(--red);color:#fff;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.7rem;flex-shrink:0}
 
-/* Footer */
-footer{margin-top:auto;padding:2.5rem 0 2rem;text-align:center;border-top:1px solid var(--border)}
-.footer-brand{font-family:var(--font-mono);font-weight:600;font-size:1.1rem;margin-bottom:0.5rem}
-.footer-links{display:flex;gap:1.5rem;justify-content:center;margin-bottom:1rem;flex-wrap:wrap;font-size:0.9rem}
-.install-box{background:var(--card);border:1px solid var(--border);border-radius:8px;display:inline-block;padding:0.5rem 1rem;font-family:var(--font-mono);font-size:0.8rem;color:var(--muted);margin-top:0.5rem}
-.install-box span{color:var(--green)}
-.footer-copy{color:var(--muted);font-size:0.78rem;margin-top:1rem}
+/* ─── Features Section ─── */
+.features-section{padding:4rem 0;border-top:1px solid var(--border)}
+.section-heading{
+  font-size:1.75rem;font-weight:700;text-align:center;margin-bottom:0.5rem;
+}
+.section-subheading{
+  color:var(--muted);text-align:center;margin-bottom:3rem;font-size:1rem;
+}
+.features-grid{
+  display:grid;grid-template-columns:repeat(2,1fr);gap:1.25rem;
+}
+.feature-card{
+  background:var(--card);border:1px solid var(--border);border-radius:14px;
+  padding:1.75rem;transition:all .3s ease;position:relative;overflow:hidden;
+}
+.feature-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--blue),transparent);
+  opacity:0;transition:opacity .3s;
+}
+.feature-card:hover{
+  border-color:var(--border-light);transform:translateY(-4px);
+  box-shadow:0 8px 32px rgba(0,0,0,0.3);
+}
+.feature-card:hover::before{opacity:1}
+.feature-icon{
+  font-size:1.75rem;margin-bottom:0.75rem;display:block;
+  width:48px;height:48px;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(88,166,255,0.08);border:1px solid rgba(88,166,255,0.15);
+}
+.feature-card:nth-child(2) .feature-icon{background:rgba(63,185,80,0.08);border-color:rgba(63,185,80,0.15)}
+.feature-card:nth-child(3) .feature-icon{background:rgba(188,140,255,0.08);border-color:rgba(188,140,255,0.15)}
+.feature-card:nth-child(4) .feature-icon{background:rgba(210,153,34,0.08);border-color:rgba(210,153,34,0.15)}
+.feature-title{font-weight:700;font-size:1rem;margin-bottom:0.35rem}
+.feature-desc{color:var(--muted);font-size:0.9rem;line-height:1.5}
 
-/* Responsive */
-@media(max-width:600px){
-  .logo{font-size:2.5rem}
+/* ─── Install Section ─── */
+.install-section{padding:4rem 0;border-top:1px solid var(--border)}
+.install-card{
+  background:var(--card);border:1px solid var(--border);border-radius:14px;
+  padding:2rem;text-align:center;max-width:640px;margin:0 auto;
+  position:relative;
+}
+.install-label{
+  font-size:0.8rem;font-weight:600;color:var(--muted);text-transform:uppercase;
+  letter-spacing:0.08em;margin-bottom:1rem;
+}
+.install-cmd{
+  background:var(--bg);border:1px solid var(--border);border-radius:10px;
+  padding:1rem 1.25rem;font-family:var(--font-mono);font-size:0.85rem;
+  display:flex;align-items:center;justify-content:space-between;gap:1rem;
+  text-align:left;
+}
+.install-cmd code{color:var(--text);white-space:nowrap;overflow-x:auto}
+.install-cmd code .prompt{color:var(--green)}
+.install-cmd .btn-copy{flex-shrink:0}
+.install-note{color:var(--muted);font-size:0.82rem;margin-top:1rem}
+
+/* ─── Footer ─── */
+footer{
+  padding:3rem 0 2.5rem;border-top:1px solid var(--border);
+  margin-top:2rem;
+}
+.footer-inner{
+  display:flex;align-items:center;justify-content:space-between;
+  flex-wrap:wrap;gap:1rem;
+}
+.footer-left{display:flex;align-items:center;gap:1.5rem}
+.footer-brand{
+  font-family:var(--font-mono);font-weight:700;font-size:1.1rem;
+  background:linear-gradient(135deg,var(--blue),var(--green));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.footer-links{display:flex;gap:1.25rem;font-size:0.85rem}
+.footer-right{display:flex;align-items:center;gap:1.5rem;color:var(--muted);font-size:0.82rem}
+.footer-right a{color:var(--muted)}
+.footer-right a:hover{color:var(--text)}
+.footer-go{display:inline-flex;align-items:center;gap:0.35rem}
+.footer-privacy{color:var(--muted);font-size:0.78rem;text-align:center;margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid var(--border)}
+
+/* ─── Responsive ─── */
+@media(max-width:768px){
+  .hero{padding:4rem 0 3rem}
+  .hero-logo{font-size:3.5rem}
+  .hero-tagline{font-size:1.05rem}
+  .features-grid{grid-template-columns:1fr}
+  .footer-inner{flex-direction:column;text-align:center}
+  .footer-left{flex-direction:column}
+}
+@media(max-width:480px){
+  .hero-logo{font-size:2.75rem}
+  .hero-tagline{font-size:0.95rem}
   textarea{min-height:100px;font-size:0.78rem}
-  pre{font-size:0.75rem}
-  .section-body{padding:0.75rem}
+  pre{font-size:0.72rem}
+  .section-body{padding:0.85rem}
+  .btn{padding:0.65rem 1.25rem;font-size:0.82rem}
+  .install-cmd{flex-direction:column;text-align:center}
+  .install-cmd code{font-size:0.75rem;white-space:normal;word-break:break-all}
 }
 </style>
 </head>
 <body>
 
-<header>
+<!-- ─── Hero ─── -->
+<section class="hero">
   <div class="container">
-    <div class="logo">jwx</div>
-    <p class="tagline">Decode JSON Web Tokens instantly in your browser</p>
-    <div class="badge-row">
+    <div class="hero-logo fade-up">jwx</div>
+    <p class="hero-tagline fade-up fade-up-d1">Decode JSON Web Tokens instantly &mdash; in your browser or terminal</p>
+    <div class="hero-buttons fade-up fade-up-d2">
+      <a href="#decoder" class="btn btn-primary">Try it below</a>
+      <a href="https://github.com/manimovassagh/jwx/releases" class="btn btn-outline">Install CLI</a>
+    </div>
+    <div class="badge-row fade-up fade-up-d3">
       <a href="https://github.com/manimovassagh/jwx/actions/workflows/ci.yml"><img src="https://github.com/manimovassagh/jwx/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
       <a href="https://github.com/manimovassagh/jwx/releases"><img src="https://img.shields.io/github/v/release/manimovassagh/jwx?include_prereleases" alt="Release"></a>
       <a href="https://github.com/manimovassagh/jwx/blob/main/LICENSE"><img src="https://img.shields.io/github/license/manimovassagh/jwx" alt="License"></a>
     </div>
   </div>
-</header>
+</section>
 
-<main>
+<!-- ─── Decoder ─── -->
+<section class="decoder-section" id="decoder">
   <div class="container">
-    <div class="input-section">
-      <label for="jwt-input">Paste a JWT</label>
-      <div class="input-wrap">
-        <textarea id="jwt-input" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c" spellcheck="false" autocomplete="off"></textarea>
-      </div>
+    <h2 class="decoder-title"><span>&gt;_</span> JWT Decoder</h2>
+
+    <div class="input-card">
+      <label class="input-label" for="jwt-input">Paste a JWT to decode</label>
+      <textarea id="jwt-input" placeholder="Paste your token here... supports raw JWT or Bearer prefix" spellcheck="false" autocomplete="off"></textarea>
       <div class="btn-row">
-        <button class="btn-primary" onclick="decode()">Decode</button>
-        <button class="btn-secondary" onclick="clearAll()">Clear</button>
+        <button class="btn-sm btn-decode" onclick="decode()">Decode</button>
+        <button class="btn-sm btn-clear" onclick="clearAll()">Clear</button>
+        <button class="btn-sm btn-sample" onclick="loadSample()">Sample Token</button>
       </div>
     </div>
 
@@ -157,23 +351,77 @@ footer{margin-top:auto;padding:2.5rem 0 2rem;text-align:center;border-top:1px so
       <div class="section signature-section">
         <div class="section-header">
           <span class="section-label"><span class="section-dot"></span>Signature</span>
+          <button class="btn-copy" id="copy-sig" onclick="copySection('signature')">Copy</button>
         </div>
         <div class="section-body"><pre id="sig-json"></pre></div>
       </div>
     </div>
   </div>
-</main>
+</section>
 
+<!-- ─── Features ─── -->
+<section class="features-section">
+  <div class="container">
+    <h2 class="section-heading">Why jwx?</h2>
+    <p class="section-subheading">A modern JWT tool built for developers who care about simplicity and privacy.</p>
+    <div class="features-grid">
+      <div class="feature-card">
+        <span class="feature-icon">&#x1f3a8;</span>
+        <div class="feature-title">Beautiful Output</div>
+        <div class="feature-desc">Colorized, syntax-highlighted token display in your terminal and browser. Timestamps are annotated with relative times.</div>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">&#x26a1;</span>
+        <div class="feature-title">Zero Dependencies</div>
+        <div class="feature-desc">Single static binary. No runtime, no node_modules, no containers. Just download and run.</div>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">&#x1f512;</span>
+        <div class="feature-title">Privacy First</div>
+        <div class="feature-desc">Your tokens never leave your machine. Decoding happens entirely client-side in the browser and locally in the CLI.</div>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">&#x1f310;</span>
+        <div class="feature-title">Open Source</div>
+        <div class="feature-desc">MIT licensed and community driven. Inspect the code, contribute features, or fork it &mdash; it's yours.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── Install ─── -->
+<section class="install-section" id="install">
+  <div class="container">
+    <h2 class="section-heading">Get Started</h2>
+    <p class="section-subheading">Install jwx with a single command.</p>
+    <div class="install-card">
+      <div class="install-label">Install via Go</div>
+      <div class="install-cmd">
+        <code><span class="prompt">$</span> go install github.com/manimovassagh/jwx/cmd/jwx@latest</code>
+        <button class="btn-copy" onclick="copyInstall(this)">Copy</button>
+      </div>
+      <p class="install-note">Requires Go 1.21+. Or download a prebuilt binary from <a href="https://github.com/manimovassagh/jwx/releases">Releases</a>.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ─── Footer ─── -->
 <footer>
   <div class="container">
-    <div class="footer-brand">jwx</div>
-    <div class="footer-links">
-      <a href="https://github.com/manimovassagh/jwx">GitHub</a>
-      <a href="https://github.com/manimovassagh/jwx/releases">Releases</a>
-      <a href="https://github.com/manimovassagh/jwx/issues">Issues</a>
+    <div class="footer-inner">
+      <div class="footer-left">
+        <span class="footer-brand">jwx</span>
+        <nav class="footer-links">
+          <a href="https://github.com/manimovassagh/jwx">GitHub</a>
+          <a href="https://github.com/manimovassagh/jwx/releases">Releases</a>
+          <a href="https://github.com/manimovassagh/jwx/issues">Issues</a>
+        </nav>
+      </div>
+      <div class="footer-right">
+        <span class="footer-go">Made with <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" stroke="#58a6ff" stroke-width="1.5"/><text x="8" y="11" text-anchor="middle" font-size="8" fill="#58a6ff" font-family="Inter,sans-serif" font-weight="700">Go</text></svg></span>
+      </div>
     </div>
-    <div class="install-box"><span>$</span> go install github.com/manimovassagh/jwx/cmd/jwx@latest</div>
-    <p class="footer-copy">Client-side only. Your tokens never leave your browser.</p>
+    <p class="footer-privacy">Your tokens never leave your browser. Everything runs client-side.</p>
   </div>
 </footer>
 
@@ -181,26 +429,25 @@ footer{margin-top:auto;padding:2.5rem 0 2rem;text-align:center;border-top:1px so
 (function(){
   var input = document.getElementById('jwt-input');
   input.addEventListener('input', function(){ decode(); });
-  input.addEventListener('paste', function(){
-    setTimeout(decode, 10);
-  });
+  input.addEventListener('paste', function(){ setTimeout(decode, 10); });
 })();
 
-function escHtml(s) {
-  var el = document.createElement('span');
-  el.textContent = s;
-  return el.innerHTML;
+var SAMPLE_JWT = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImtleS0xIn0.eyJzdWIiOiJ1c2VyXzQyIiwibmFtZSI6IkFsaWNlIEpvaG5zb24iLCJlbWFpbCI6ImFsaWNlQGV4YW1wbGUuY29tIiwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzAwMDAwMDAwLCJleHAiOjE3MDAwODY0MDAsIm5iZiI6MTcwMDAwMDAwMCwiaXNzIjoiaHR0cHM6Ly9hdXRoLmV4YW1wbGUuY29tIiwiYXVkIjoiaHR0cHM6Ly9hcGkuZXhhbXBsZS5jb20ifQ.signature_placeholder';
+
+function loadSample(){
+  document.getElementById('jwt-input').value = SAMPLE_JWT;
+  decode();
 }
 
-function base64urlDecode(str) {
-  str = str.replace(/-/g, '+').replace(/_/g, '/');
-  while (str.length % 4) str += '=';
+function base64urlDecode(str){
+  str = str.replace(/-/g,'+').replace(/_/g,'/');
+  while(str.length % 4) str += '=';
   return decodeURIComponent(atob(str).split('').map(function(c){
     return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
   }).join(''));
 }
 
-function decode() {
+function decode(){
   var raw = document.getElementById('jwt-input').value.trim();
   var errEl = document.getElementById('error');
   var decodedEl = document.getElementById('decoded');
@@ -211,47 +458,40 @@ function decode() {
   decodedEl.className = 'decoded';
   statusEl.textContent = '';
 
-  if (!raw) return;
+  if(!raw) return;
 
-  if (raw.toLowerCase().indexOf('bearer ') === 0) {
+  if(raw.toLowerCase().indexOf('bearer ') === 0){
     raw = raw.slice(7);
   }
 
   var parts = raw.split('.');
-  if (parts.length !== 3) {
-    showError('Invalid JWT: expected 3 parts separated by dots, got ' + parts.length);
+  if(parts.length !== 3){
+    showError('Invalid JWT: expected 3 dot-separated parts, got ' + parts.length);
     return;
   }
 
   var header, payload;
-  try {
-    header = JSON.parse(base64urlDecode(parts[0]));
-  } catch(e) {
-    showError('Failed to decode header: ' + e.message);
-    return;
-  }
-  try {
-    payload = JSON.parse(base64urlDecode(parts[1]));
-  } catch(e) {
-    showError('Failed to decode payload: ' + e.message);
-    return;
-  }
+  try{ header = JSON.parse(base64urlDecode(parts[0])); }
+  catch(e){ showError('Failed to decode header: ' + e.message); return; }
+  try{ payload = JSON.parse(base64urlDecode(parts[1])); }
+  catch(e){ showError('Failed to decode payload: ' + e.message); return; }
 
   window._jwxHeader = JSON.stringify(header, null, 2);
   window._jwxPayload = JSON.stringify(payload, null, 2);
+  window._jwxSignature = parts[2];
 
-  // Build status badges using DOM
+  // Build status badges
   statusEl.textContent = '';
-  if (header.alg) {
+  if(header.alg){
     var algBadge = document.createElement('span');
     algBadge.className = 'alg-badge';
     algBadge.textContent = header.alg;
     statusEl.appendChild(algBadge);
   }
-  if (typeof payload.exp === 'number') {
+  if(typeof payload.exp === 'number'){
     var now = Math.floor(Date.now() / 1000);
     var expiryBadge = document.createElement('span');
-    if (payload.exp > now) {
+    if(payload.exp > now){
       expiryBadge.className = 'expiry-badge valid';
       expiryBadge.textContent = 'Valid';
     } else {
@@ -261,7 +501,6 @@ function decode() {
     statusEl.appendChild(expiryBadge);
   }
 
-  // Render sections using safe DOM methods
   renderJson(document.getElementById('header-json'), header, false);
   renderJson(document.getElementById('payload-json'), payload, true);
 
@@ -275,18 +514,18 @@ function decode() {
   decodedEl.className = 'decoded show';
 }
 
-function renderJson(container, obj, detectTimestamps) {
+function renderJson(container, obj, detectTimestamps){
   container.textContent = '';
   var json = JSON.stringify(obj, null, 2);
   var lines = json.split('\n');
 
-  for (var i = 0; i < lines.length; i++) {
-    if (i > 0) container.appendChild(document.createTextNode('\n'));
+  for(var i = 0; i < lines.length; i++){
+    if(i > 0) container.appendChild(document.createTextNode('\n'));
     appendHighlightedLine(container, lines[i]);
 
-    if (detectTimestamps) {
+    if(detectTimestamps){
       var tsMatch = lines[i].match(/"(exp|iat|nbf|auth_time)"\s*:\s*(\d+)/);
-      if (tsMatch) {
+      if(tsMatch){
         container.appendChild(document.createTextNode('\n'));
         var tsSpan = document.createElement('span');
         tsSpan.className = 'json-ts';
@@ -297,83 +536,70 @@ function renderJson(container, obj, detectTimestamps) {
   }
 }
 
-function appendHighlightedLine(container, line) {
-  // Tokenize JSON line and append colored spans
-  var remaining = line;
-
-  // Match key-value patterns
+function appendHighlightedLine(container, line){
   var kvRegex = /^(\s*)"([^"]+)"\s*:\s*(.*)/;
-  var kvMatch = remaining.match(kvRegex);
+  var kvMatch = line.match(kvRegex);
 
-  if (kvMatch) {
-    var indent = kvMatch[1];
-    var key = kvMatch[2];
-    var valPart = kvMatch[3];
-
-    container.appendChild(document.createTextNode(indent));
-
+  if(kvMatch){
+    container.appendChild(document.createTextNode(kvMatch[1]));
     var keySpan = document.createElement('span');
     keySpan.className = 'json-key';
-    keySpan.textContent = '"' + key + '"';
+    keySpan.textContent = '"' + kvMatch[2] + '"';
     container.appendChild(keySpan);
-
     container.appendChild(document.createTextNode(': '));
-
-    appendValue(container, valPart);
+    appendValue(container, kvMatch[3]);
     return;
   }
 
-  // Standalone value lines (arrays, closing braces, etc.)
-  var standaloneStr = remaining.match(/^(\s*)"([^"]*)"(,?)$/);
-  if (standaloneStr) {
+  var standaloneStr = line.match(/^(\s*)"([^"]*)"(,?)$/);
+  if(standaloneStr){
     container.appendChild(document.createTextNode(standaloneStr[1]));
     var strSpan = document.createElement('span');
     strSpan.className = 'json-string';
     strSpan.textContent = '"' + standaloneStr[2] + '"';
     container.appendChild(strSpan);
-    if (standaloneStr[3]) container.appendChild(document.createTextNode(standaloneStr[3]));
+    if(standaloneStr[3]) container.appendChild(document.createTextNode(standaloneStr[3]));
     return;
   }
 
   container.appendChild(document.createTextNode(line));
 }
 
-function appendValue(container, valStr) {
+function appendValue(container, valStr){
   valStr = valStr.trim();
   var trailing = '';
-  if (valStr.endsWith(',')) {
+  if(valStr.endsWith(',')){
     trailing = ',';
     valStr = valStr.slice(0, -1);
   }
 
   var span = document.createElement('span');
 
-  if (valStr.charAt(0) === '"' && valStr.charAt(valStr.length - 1) === '"') {
+  if(valStr.charAt(0) === '"' && valStr.charAt(valStr.length - 1) === '"'){
     span.className = 'json-string';
     span.textContent = valStr;
-  } else if (/^-?\d+\.?\d*$/.test(valStr)) {
+  } else if(/^-?\d+\.?\d*$/.test(valStr)){
     span.className = 'json-number';
     span.textContent = valStr;
-  } else if (valStr === 'true' || valStr === 'false' || valStr === 'null') {
+  } else if(valStr === 'true' || valStr === 'false' || valStr === 'null'){
     span.className = 'json-bool';
     span.textContent = valStr;
   } else {
-    // Object/array start, etc.
     span = null;
     container.appendChild(document.createTextNode(valStr));
   }
 
-  if (span) container.appendChild(span);
-  if (trailing) container.appendChild(document.createTextNode(trailing));
+  if(span) container.appendChild(span);
+  if(trailing) container.appendChild(document.createTextNode(trailing));
 }
 
-function showError(msg) {
+function showError(msg){
   var el = document.getElementById('error');
   el.textContent = msg;
   el.className = 'error-msg show';
 }
 
-function clearAll() {
+function clearAll(){
   document.getElementById('jwt-input').value = '';
   document.getElementById('error').className = 'error-msg';
   document.getElementById('error').textContent = '';
@@ -381,44 +607,35 @@ function clearAll() {
   document.getElementById('status').textContent = '';
 }
 
-function formatTimestamp(key, ts) {
+function formatTimestamp(key, ts){
   var date = new Date(ts * 1000);
   var dateStr = date.toISOString().replace('T', ' ').replace(/\.\d+Z$/, ' UTC');
   var now = Math.floor(Date.now() / 1000);
   var diff = ts - now;
   var rel = '';
 
-  if (key === 'exp') {
-    if (diff > 0) {
-      rel = '  \u2713 Expires ' + relativeTime(diff);
-    } else {
-      rel = '  \u26a0 EXPIRED ' + relativeTime(-diff) + ' ago';
-    }
-  } else if (key === 'nbf') {
-    if (diff > 0) {
-      rel = '  \u26a0 Not valid for another ' + relativeTime(diff);
-    } else {
-      rel = '  \u2713 Active since ' + relativeTime(-diff) + ' ago';
-    }
-  } else if (key === 'iat' || key === 'auth_time') {
-    if (diff <= 0) {
-      rel = '  ' + relativeTime(-diff) + ' ago';
-    } else {
-      rel = '  in ' + relativeTime(diff);
-    }
+  if(key === 'exp'){
+    if(diff > 0) rel = '  \u2713 Expires ' + relativeTime(diff);
+    else rel = '  \u26a0 EXPIRED ' + relativeTime(-diff) + ' ago';
+  } else if(key === 'nbf'){
+    if(diff > 0) rel = '  \u26a0 Not valid for another ' + relativeTime(diff);
+    else rel = '  \u2713 Active since ' + relativeTime(-diff) + ' ago';
+  } else if(key === 'iat' || key === 'auth_time'){
+    if(diff <= 0) rel = '  ' + relativeTime(-diff) + ' ago';
+    else rel = '  in ' + relativeTime(diff);
   }
   return dateStr + rel;
 }
 
-function relativeTime(sec) {
-  if (sec < 60) return sec + 's';
+function relativeTime(sec){
+  if(sec < 60) return sec + 's';
   var min = Math.floor(sec / 60);
-  if (min < 60) return min + ' minute' + (min === 1 ? '' : 's');
+  if(min < 60) return min + ' minute' + (min === 1 ? '' : 's');
   var hrs = Math.floor(min / 60);
-  if (hrs < 24) return hrs + ' hour' + (hrs === 1 ? '' : 's');
+  if(hrs < 24) return hrs + ' hour' + (hrs === 1 ? '' : 's');
   var days = Math.floor(hrs / 24);
-  if (days < 30) return days + ' day' + (days === 1 ? '' : 's');
-  if (days < 365) {
+  if(days < 30) return days + ' day' + (days === 1 ? '' : 's');
+  if(days < 365){
     var months = Math.floor(days / 30);
     return months + ' month' + (months === 1 ? '' : 's');
   }
@@ -426,17 +643,36 @@ function relativeTime(sec) {
   return years + ' year' + (years === 1 ? '' : 's');
 }
 
-function copySection(which) {
-  var text = which === 'header' ? window._jwxHeader : window._jwxPayload;
-  if (!text) return;
-  var btnId = which === 'header' ? 'copy-header' : 'copy-payload';
+function copySection(which){
+  var text;
+  var btnId;
+  if(which === 'header'){ text = window._jwxHeader; btnId = 'copy-header'; }
+  else if(which === 'payload'){ text = window._jwxPayload; btnId = 'copy-payload'; }
+  else if(which === 'signature'){ text = window._jwxSignature; btnId = 'copy-sig'; }
+  if(!text) return;
+
   var btn = document.getElementById(btnId);
   navigator.clipboard.writeText(text).then(function(){
-    if (btn) {
-      var orig = btn.textContent;
+    if(btn){
       btn.textContent = 'Copied!';
-      setTimeout(function(){ btn.textContent = orig; }, 1200);
+      btn.classList.add('copied');
+      setTimeout(function(){
+        btn.textContent = 'Copy';
+        btn.classList.remove('copied');
+      }, 1500);
     }
+  });
+}
+
+function copyInstall(btn){
+  var cmd = 'go install github.com/manimovassagh/jwx/cmd/jwx@latest';
+  navigator.clipboard.writeText(cmd).then(function(){
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(function(){
+      btn.textContent = 'Copy';
+      btn.classList.remove('copied');
+    }, 1500);
   });
 }
 </script>

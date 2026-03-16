@@ -14,7 +14,7 @@
 **jwx** decodes, signs, verifies, and audits JWTs — with beautiful, colorized terminal output.
 
 <p align="center">
-  <img src="docs/assets/demo.gif" alt="jwx demo" width="800">
+  <img src="docs/assets/jwx-demo.gif" alt="jwx demo" width="800">
 </p>
 
 > **Try it in your browser**: [manimovassagh.github.io/jwx](https://manimovassagh.github.io/jwx/)

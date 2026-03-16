@@ -1,7 +1,9 @@
 #!/bin/sh
-# Pre-commit hook: fmt + lint
+# Pre-commit hook: fmt + lint + test + coverage gate
 
 set -e
+
+MIN_COVERAGE=80
 
 echo "▸ Running gofmt..."
 UNFMT=$(gofmt -l . 2>&1 | grep -v vendor || true)
@@ -21,6 +23,29 @@ echo "  ✓ go vet passed"
 echo "▸ Running golangci-lint..."
 golangci-lint run --timeout 60s
 echo "  ✓ golangci-lint passed"
+
+echo "▸ Running tests with coverage..."
+COVERAGE_OUT=$(go test ./... -coverprofile=/tmp/jwx-coverage.out 2>&1)
+echo "$COVERAGE_OUT" | grep -v "no test files"
+
+# Calculate total coverage
+TOTAL=$(go tool cover -func=/tmp/jwx-coverage.out 2>/dev/null | grep "total:" | awk '{print $NF}' | tr -d '%')
+
+if [ -z "$TOTAL" ]; then
+    echo "  ⚠ Could not determine coverage"
+else
+    # Compare using integer math (multiply by 10 to handle one decimal)
+    TOTAL_INT=$(echo "$TOTAL" | awk '{printf "%d", $1 * 10}')
+    MIN_INT=$((MIN_COVERAGE * 10))
+
+    if [ "$TOTAL_INT" -lt "$MIN_INT" ]; then
+        echo ""
+        echo "✗ Coverage ${TOTAL}% is below minimum ${MIN_COVERAGE}%"
+        echo "  Run: go test ./... -cover"
+        exit 1
+    fi
+    echo "  ✓ Coverage: ${TOTAL}% (minimum: ${MIN_COVERAGE}%)"
+fi
 
 echo ""
 echo "✓ All checks passed"

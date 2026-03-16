@@ -93,9 +93,59 @@
   --ts-border:rgba(55,48,163,.3);
   --ts-bg:rgba(55,48,163,.06);
 }
+/* ─── prefers-color-scheme: auto light when no data-theme set (Issue #111, #139, #150) ─── */
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme]) {
+    --bg:#f4f5f7;
+    --surface:#ffffff;
+    --surface-2:#eef0f2;
+    --border:#d1d5db;
+    --text:#111827;
+    --muted:#4b5563;
+    --green-bg:rgba(34,197,94,.1);
+    --red-bg:rgba(239,68,68,.1);
+    --dec-bg:#ffffff;
+    --dec-surface:#f8f9fa;
+    --dec-border:#d1d5db;
+    --dec-text:#111827;
+    --dec-muted:#4b5563;
+    --key:#3730a3;
+    --str:#166534;
+    --num:#92400e;
+    --bool:#6d28d9;
+    --input-bg:#eef0f2;
+    --input-text:#111827;
+    --input-placeholder:#6b7280;
+    --section-header-bg:rgba(0,0,0,.03);
+    --copy-bg:transparent;
+    --copy-border:#9ca3af;
+    --copy-text:#4b5563;
+    --alg-bg:rgba(55,48,163,.1);
+    --alg-color:#3730a3;
+    --alg-border:rgba(55,48,163,.2);
+    --ts-border:rgba(55,48,163,.3);
+    --ts-bg:rgba(55,48,163,.06);
+  }
+}
 html{font-size:16px}
-body{background:var(--bg);color:var(--text);font-family:var(--font);overflow:hidden;height:100vh;width:100vw;transition:background .3s,color .3s}
-.header,.panel-left,.panel-right,.decoded-header,.section,.section-top,.footer,.encoded-area,.pill{transition:background .3s,border-color .3s,color .3s}
+body{background:var(--bg);color:var(--text);font-family:var(--font);overflow:hidden;height:100vh;width:100vw}
+
+/* ─── Animations only when user has no reduced-motion preference (Issue #120) ─── */
+@media (prefers-reduced-motion: no-preference) {
+  body{transition:background .3s,color .3s}
+  .header,.panel-left,.panel-right,.decoded-header,.section,.section-top,.footer,.encoded-area,.pill{transition:background .3s,border-color .3s,color .3s}
+  .header-right a{transition:color .2s}
+  .theme-toggle{transition:all .2s}
+  .badge-row img{transition:opacity .2s}
+  .privacy-dot{animation:pulse 3s infinite}
+  @keyframes pulse{0%,100%{opacity:.5}50%{opacity:1}}
+  .encoded-area{transition:border-color .3s,box-shadow .3s}
+  .pill{transition:all .15s}
+  .section{transition:box-shadow .2s}
+  .copy-btn{transition:all .15s}
+  .footer a{transition:color .15s}
+  .footer-install{transition:all .15s}
+}
 
 /* ─── LAYOUT: Full viewport, no scroll ─── */
 .app{display:flex;flex-direction:column;height:100vh;width:100vw;overflow:hidden}
@@ -115,19 +165,18 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow:hid
   letter-spacing:-.03em;
 }
 .header-right{display:flex;align-items:center;gap:1rem}
-.header-right a{color:var(--muted);font-size:.8rem;transition:color .2s;font-weight:500}
+.header-right a{color:var(--muted);font-size:.8rem;font-weight:500}
 .header-right a:hover{color:var(--text);text-decoration:none}
 .theme-toggle{
   cursor:pointer;background:var(--surface-2);border:1px solid var(--border);
   border-radius:8px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;
-  font-size:.9rem;transition:all .2s;line-height:1;
+  font-size:.9rem;line-height:1;
 }
 .theme-toggle:hover{border-color:var(--accent);background:rgba(109,93,252,.1)}
 .badge-row{display:flex;gap:.5rem;align-items:center}
-.badge-row img{height:18px;opacity:.8;transition:opacity .2s}
+.badge-row img{height:18px;opacity:.8}
 .badge-row a:hover img{opacity:1}
-.privacy-dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);animation:pulse 3s infinite}
-@keyframes pulse{0%,100%{opacity:.5}50%{opacity:1}}
+.privacy-dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green)}
 .footer-privacy{display:flex;align-items:center;gap:.4rem}
 
 /* ─── Focus-visible styles ─── */
@@ -152,7 +201,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow:hid
   flex:1;width:100%;background:var(--input-bg);border:1px solid var(--border);
   border-radius:10px;color:var(--input-text);font-family:var(--mono);font-size:.92rem;
   padding:1.2rem;resize:none;outline:none;line-height:1.8;
-  transition:border-color .3s,box-shadow .3s;
 }
 .encoded-area:focus{
   border-color:rgba(109,93,252,.4);
@@ -164,7 +212,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow:hid
 .pill{
   cursor:pointer;background:var(--surface-2);border:1px solid var(--border);
   border-radius:100px;font-family:var(--font);font-size:.8rem;font-weight:500;
-  padding:.4rem .9rem;color:var(--muted);transition:all .15s;
+  padding:.4rem .9rem;color:var(--muted);
   display:flex;align-items:center;gap:.35rem;
 }
 .pill:hover{border-color:rgba(109,93,252,.4);color:var(--text);background:rgba(109,93,252,.08)}
@@ -201,7 +249,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow:hid
 .section{
   background:var(--dec-surface);border:1px solid var(--dec-border);
   border-radius:8px;margin-bottom:.6rem;overflow:hidden;
-  transition:box-shadow .2s;
 }
 .section:hover{box-shadow:0 2px 12px rgba(0,0,0,.04)}
 .section.header-s{border-left:3px solid #6366f1}
@@ -221,7 +268,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow:hid
 .copy-btn{
   cursor:pointer;background:var(--copy-bg);border:1px solid var(--copy-border);
   color:var(--copy-text);padding:.3rem .7rem;font-size:.73rem;border-radius:6px;
-  font-family:var(--font);font-weight:500;transition:all .15s;
+  font-family:var(--font);font-weight:500;
 }
 .copy-btn:hover{border-color:#a1a1aa;color:var(--dec-text)}
 .copy-btn.done{border-color:var(--green);color:var(--green)}
@@ -258,13 +305,13 @@ pre{font-family:var(--mono);font-size:.85rem;line-height:1.65;white-space:pre-wr
   padding:.3rem 1.2rem;background:var(--surface);border-top:1px solid var(--border);
   flex-shrink:0;font-size:.7rem;color:var(--muted);
 }
-.footer a{color:var(--muted);transition:color .15s}
+.footer a{color:var(--muted)}
 .footer a:hover{color:var(--text);text-decoration:none}
 .footer-links{display:flex;gap:1rem}
 .footer-install{
   font-family:var(--mono);font-size:.68rem;color:#52525b;
   background:var(--bg);padding:.25rem .6rem;border-radius:6px;border:1px solid var(--border);
-  cursor:pointer;transition:all .15s;
+  cursor:pointer;
 }
 .footer-install:hover{border-color:rgba(109,93,252,.3);color:var(--text)}
 
@@ -276,6 +323,14 @@ pre{font-family:var(--mono);font-size:.85rem;line-height:1.65;white-space:pre-wr
   .badge-row{display:none}
   .panel-left,.panel-right{overflow:visible}
   .panel-left{border-right:none;border-bottom:1px solid var(--border)}
+  .encoded-area{font-size:16px}
+}
+/* ─── SMALL MOBILE: touch targets + footer fix (Issues from mobile audit) ─── */
+@media(max-width:480px){
+  .footer{flex-direction:column;align-items:stretch;gap:.5rem;padding:.5rem .75rem}
+  .pill{min-height:44px;padding:.55rem 1rem}
+  .copy-btn{min-height:44px;padding:.45rem .85rem}
+  .theme-toggle{width:44px;height:44px}
   .encoded-area{font-size:16px}
 }
 </style>
@@ -297,7 +352,7 @@ pre{font-family:var(--mono);font-size:.85rem;line-height:1.65;white-space:pre-wr
         <a href="https://github.com/manimovassagh/jwx/actions/workflows/ci.yml"><img src="https://github.com/manimovassagh/jwx/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
         <a href="https://github.com/manimovassagh/jwx/releases"><img src="https://img.shields.io/github/v/release/manimovassagh/jwx?style=flat-square&color=6d5dfc" alt="Release"></a>
       </div>
-      <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme" id="theme-btn" aria-label="Toggle dark and light theme">☀️</button>
+      <button class="theme-toggle" title="Toggle theme" id="theme-btn" aria-label="Toggle dark and light theme">☀️</button>
       <span class="privacy-dot" title="Client-side only" role="img" aria-label="Client-side only"></span>
       <a href="https://github.com/manimovassagh/jwx">GitHub ↗</a>
     </div>
@@ -335,7 +390,7 @@ pre{font-family:var(--mono);font-size:.85rem;line-height:1.65;white-space:pre-wr
       <a href="https://github.com/manimovassagh/jwx/releases">Releases</a>
       <a href="https://github.com/manimovassagh/jwx/issues">Issues</a>
     </div>
-    <button class="footer-install" onclick="copyInstall(this)" title="Click to copy">$ go install github.com/manimovassagh/jwx/cmd/jwx@latest</button>
+    <button class="footer-install" id="install-btn" title="Click to copy">$ go install github.com/manimovassagh/jwx/cmd/jwx@latest</button>
     <div class="footer-privacy">
       <span class="privacy-dot"></span>
       <span>⚠️ Warning: JWTs are credentials — do not paste tokens containing real secrets or production data. This tool runs client-side only, but treat tokens with care.</span>
@@ -353,6 +408,20 @@ var SAMPLES = {
 };
 var _h,_p,_s;
 
+/* ─── Debounce helper (Issue #38) ─── */
+function debounce(fn,ms){var t;return function(){var ctx=this,args=arguments;clearTimeout(t);t=setTimeout(function(){fn.apply(ctx,args)},ms)}}
+
+/* ─── Validate JWT format: must start with eyJ and have exactly 2 dots (Issue #5, #39, #61, #71, #88, #101, #110) ─── */
+function isJwtFormat(s){
+  return /^eyJ/.test(s) && s.split('.').length===3;
+}
+
+/* ─── OS theme detection (Issue #111, #139, #150) ─── */
+function getOsTheme(){
+  if(window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches)return'light';
+  return'dark';
+}
+
 (function(){
   // Build pills
   var pc=document.getElementById('pills');
@@ -365,19 +434,38 @@ var _h,_p,_s;
     pc.appendChild(b);
   });
 
-  // Auto-decode
+  // Auto-decode with 150ms debounce (Issue #38)
   var inp=document.getElementById('input');
-  inp.addEventListener('input',decode);
+  var debouncedDecode=debounce(decode,150);
+  inp.addEventListener('input',debouncedDecode);
   inp.addEventListener('paste',function(){
     inp.classList.add('flash');
     setTimeout(function(){inp.classList.remove('flash')},300);
     setTimeout(decode,10);
   });
 
-  // Load from hash or default token
+  // Theme toggle via addEventListener — no inline onclick (Issue #18, #58)
+  document.getElementById('theme-btn').addEventListener('click',toggleTheme);
+
+  // Footer install button via addEventListener — no inline onclick (Issue #18, #58)
+  document.getElementById('install-btn').addEventListener('click',function(){copyInstall(this)});
+
+  // Load from hash or default token (Issues #5, #39, #61, #71, #88, #101, #110)
   if(location.hash.length>10){
-    inp.value=decodeURIComponent(location.hash.slice(1));
-    decode();
+    var hashVal=location.hash.slice(1);
+    // Cap hash to 8000 chars for browser safety
+    if(hashVal.length>8000){hashVal=hashVal.slice(0,8000)}
+    var decoded;
+    try{decoded=decodeURIComponent(hashVal)}catch(e){decoded=hashVal}
+    // Validate hash looks like a JWT before using
+    var cleaned=decoded.replace(/\s+/g,'');
+    if(cleaned.toLowerCase().indexOf('bearer ')===0)cleaned=cleaned.slice(7);
+    if(isJwtFormat(cleaned)){
+      inp.value=decoded;
+      decode();
+    } else {
+      pick('rich');
+    }
   } else {
     pick('rich');
   }
@@ -402,7 +490,8 @@ function decode(){
   var empty=document.getElementById('empty');
 
   badges.textContent='';
-  if(!raw){out.innerHTML='';out.appendChild(empty);empty.style.display='';return}
+  // Fix innerHTML usage (code quality audit) — use DOM removal instead
+  if(!raw){while(out.firstChild)out.removeChild(out.firstChild);out.appendChild(empty);empty.style.display='';return}
   if(empty)empty.style.display='none';
 
   if(raw.toLowerCase().indexOf('bearer ')===0)raw=raw.slice(7);
@@ -417,10 +506,14 @@ function decode(){
   try{header=JSON.parse(b64(parts[0]))}catch(e){showErr(out,'Could not decode header. Check that this is a valid JWT.');return}
   try{payload=JSON.parse(b64(parts[1]))}catch(e){showErr(out,'Could not decode payload. The token may be corrupted.');return}
 
+  // JWT format validation: header and payload must be non-null, non-array objects (Issue #157)
+  if(typeof header!=='object'||header===null||Array.isArray(header)){showErr(out,'Invalid JWT: header must be a JSON object.');return}
+  if(typeof payload!=='object'||payload===null||Array.isArray(payload)){showErr(out,'Invalid JWT: payload must be a JSON object.');return}
+
   _h=JSON.stringify(header,null,2);_p=JSON.stringify(payload,null,2);_s=parts[2];
 
-  // Update URL hash
-  try{history.replaceState(null,'','#'+raw)}catch(e){}
+  // Update URL hash — URL-encode the token (Issues #5, #39, #61, #71, #88, #101, #110)
+  try{history.replaceState(null,'','#'+encodeURIComponent(raw))}catch(e){}
 
   // Badges
   if(header.alg){var ab=document.createElement('span');ab.className='alg-badge';ab.textContent=header.alg;badges.appendChild(ab)}
@@ -431,8 +524,8 @@ function decode(){
     badges.appendChild(eb);
   }
 
-  // Render sections
-  out.textContent='';
+  // Render sections — use DOM removal instead of innerHTML (code quality audit)
+  while(out.firstChild)out.removeChild(out.firstChild);
   out.appendChild(makeSection('Header','header-s','blue',header,false));
   out.appendChild(makeSection('Payload','payload-s','green',payload,true));
 
@@ -442,7 +535,7 @@ function decode(){
   var sigDot=document.createElement('span');sigDot.className='sec-dot gold';
   sigName.appendChild(sigDot);sigName.appendChild(document.createTextNode('Signature'));
   var sigCopy=document.createElement('button');sigCopy.className='copy-btn';sigCopy.textContent='Copy';
-  sigCopy.onclick=function(){copyText(_s,sigCopy)};
+  sigCopy.addEventListener('click',function(){copyText(_s,sigCopy)});
   sigTop.appendChild(sigName);sigTop.appendChild(sigCopy);
   var sigBody=document.createElement('div');sigBody.className='section-content';
   var sigPre=document.createElement('pre');
@@ -460,7 +553,7 @@ function makeSection(name,cls,dotCls,obj,timestamps){
   nm.appendChild(dot);nm.appendChild(document.createTextNode(name));
   var cb=document.createElement('button');cb.className='copy-btn';cb.textContent='Copy';
   var json=JSON.stringify(obj,null,2);
-  cb.onclick=function(){copyText(json,cb)};
+  cb.addEventListener('click',function(){copyText(json,cb)});
   top.appendChild(nm);top.appendChild(cb);
 
   var body=document.createElement('div');body.className='section-content';
@@ -505,7 +598,7 @@ function appendVal(el,v){
 }
 
 function showErr(out,msg){
-  out.textContent='';
+  while(out.firstChild)out.removeChild(out.firstChild);
   var e=document.createElement('div');e.className='error-state';e.textContent=msg;
   out.appendChild(e);
 }
@@ -525,35 +618,81 @@ function rel(s){
   var y=Math.floor(d/365);return y+' year'+(y>1?'s':'');
 }
 
+/* ─── Clipboard with fallback (Issue #6 from security audit) ─── */
 function copyText(t,btn){
-  navigator.clipboard.writeText(t).then(function(){
+  try{
+    navigator.clipboard.writeText(t).then(function(){
+      btn.textContent='Copied!';btn.classList.add('done');
+      setTimeout(function(){btn.textContent='Copy';btn.classList.remove('done')},1200);
+    },function(){
+      copyFallback(t,btn);
+    });
+  }catch(e){
+    copyFallback(t,btn);
+  }
+}
+function copyFallback(t,btn){
+  try{
+    var ta=document.createElement('textarea');
+    ta.value=t;ta.style.position='fixed';ta.style.left='-9999px';
+    document.body.appendChild(ta);ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
     btn.textContent='Copied!';btn.classList.add('done');
     setTimeout(function(){btn.textContent='Copy';btn.classList.remove('done')},1200);
-  });
+  }catch(e){
+    btn.textContent='Failed';
+    setTimeout(function(){btn.textContent='Copy'},1200);
+  }
 }
+
 function toggleTheme(){
   var html=document.documentElement;
-  var current=html.getAttribute('data-theme')||'dark';
+  var current=html.getAttribute('data-theme')||getOsTheme();
   var next=current==='dark'?'light':'dark';
   html.setAttribute('data-theme',next);
   document.getElementById('theme-btn').textContent=next==='dark'?'☀️':'🌙';
   try{localStorage.setItem('jwx-theme',next)}catch(e){}
 }
+
 (function(){
   try{
     var saved=localStorage.getItem('jwx-theme');
     if(saved){
       document.documentElement.setAttribute('data-theme',saved);
       document.getElementById('theme-btn').textContent=saved==='dark'?'☀️':'🌙';
+    } else {
+      // No saved preference — check OS preference (Issue #111, #139, #150)
+      var os=getOsTheme();
+      // Don't set data-theme so CSS @media prefers-color-scheme applies
+      document.getElementById('theme-btn').textContent=os==='dark'?'☀️':'🌙';
     }
   }catch(e){}
 })();
 
 function copyInstall(btn){
-  navigator.clipboard.writeText('go install github.com/manimovassagh/jwx/cmd/jwx@latest').then(function(){
+  try{
+    navigator.clipboard.writeText('go install github.com/manimovassagh/jwx/cmd/jwx@latest').then(function(){
+      var orig=btn.textContent;btn.textContent='Copied!';
+      setTimeout(function(){btn.textContent=orig},1200);
+    },function(){
+      copyInstallFallback(btn);
+    });
+  }catch(e){
+    copyInstallFallback(btn);
+  }
+}
+function copyInstallFallback(btn){
+  try{
+    var ta=document.createElement('textarea');
+    ta.value='go install github.com/manimovassagh/jwx/cmd/jwx@latest';
+    ta.style.position='fixed';ta.style.left='-9999px';
+    document.body.appendChild(ta);ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
     var orig=btn.textContent;btn.textContent='Copied!';
     setTimeout(function(){btn.textContent=orig},1200);
-  });
+  }catch(e){}
 }
 </script>
 </body>

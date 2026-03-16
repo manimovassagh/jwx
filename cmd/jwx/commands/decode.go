@@ -33,7 +33,6 @@ Pass the token as an argument, read from clipboard, or pipe via stdin:
 
 func init() {
 	decodeCmd.Flags().BoolVarP(&jsonOutput, "json", "j", false, "Output as JSON (for piping)")
-	decodeCmd.Flags().BoolVarP(&clipboardFlag, "clipboard", "c", false, "Read JWT from system clipboard")
 }
 
 func runDecode(cmd *cobra.Command, args []string) error {
@@ -76,9 +75,9 @@ func runDecode(cmd *cobra.Command, args []string) error {
 		fmt.Println(display.Render(token))
 	}
 
-	// Exit code 2 if expired (still show output)
+	// Return exit code 2 if expired (output already shown above)
 	if token.IsExpired {
-		os.Exit(2)
+		return &ExitError{Code: 2, Err: fmt.Errorf("token is expired")}
 	}
 
 	return nil

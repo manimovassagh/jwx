@@ -1,6 +1,6 @@
 <p align="center">
   <h1 align="center">jwx</h1>
-  <p align="center"><strong>Decode JWTs instantly. No browser, no server, no nonsense.</strong></p>
+  <p align="center"><strong>Decode JWTs instantly. In your terminal or browser — privacy first.</strong></p>
   <p align="center">
     <a href="https://github.com/manimovassagh/jwx/actions/workflows/ci.yml"><img src="https://github.com/manimovassagh/jwx/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
     <a href="https://goreportcard.com/report/github.com/manimovassagh/jwx"><img src="https://goreportcard.com/badge/github.com/manimovassagh/jwx" alt="Go Report Card"></a>
@@ -105,8 +105,6 @@ jwx --json eyJhbGci... | jq .payload.sub
 | `0` | Success |
 | `1` | Invalid or malformed token |
 | `2` | Token is expired (output still shown) |
-| `3` | Signature verification failed |
-| `4` | Key error (file not found, wrong format) |
 
 ## Shell Completions
 

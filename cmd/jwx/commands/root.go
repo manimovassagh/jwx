@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"strings"
@@ -56,14 +57,9 @@ func Execute() error {
 				switch arg {
 				case "--json", "-j":
 					jsonOutput = true
-				case "--no-color":
-					display.NoColor = true
 				case "--clipboard", "-c":
 					clipboardFlag = true
 				}
-			}
-			if noColor || os.Getenv("NO_COLOR") != "" {
-				display.NoColor = true
 			}
 
 			// Find and decode the JWT token
@@ -73,7 +69,10 @@ func Execute() error {
 				}
 			}
 		}
-		fmt.Fprintln(os.Stderr, "Error:", err)
+		var exitErr *ExitError
+		if !errors.As(err, &exitErr) {
+			fmt.Fprintln(os.Stderr, "Error:", err)
+		}
 		return err
 	}
 	return nil

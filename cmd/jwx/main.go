@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"os"
 
@@ -17,6 +18,10 @@ var (
 func main() {
 	commands.SetVersion(version, commit, date)
 	if err := commands.Execute(); err != nil {
+		var exitErr *commands.ExitError
+		if errors.As(err, &exitErr) {
+			os.Exit(exitErr.Code)
+		}
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}

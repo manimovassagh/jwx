@@ -173,16 +173,7 @@ func TestDecodeCmd_Clipboard(t *testing.T) {
 }
 
 func TestClipboardFlagExists(t *testing.T) {
-	// Verify the --clipboard / -c flag is registered on decodeCmd
-	f := decodeCmd.Flags().Lookup("clipboard")
-	if f == nil {
-		t.Fatal("decode command missing --clipboard flag")
-	}
-	if f.Shorthand != "c" {
-		t.Errorf("expected shorthand 'c', got %q", f.Shorthand)
-	}
-
-	// Verify the flag is also on rootCmd
+	// Verify the --clipboard / -c flag is registered on rootCmd
 	rf := rootCmd.Flags().Lookup("clipboard")
 	if rf == nil {
 		t.Fatal("root command missing --clipboard flag")

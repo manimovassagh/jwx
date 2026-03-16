@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6d5dfc"/>
+      <stop offset="100%" stop-color="#b44dff"/>
+    </linearGradient>
+    <linearGradient id="keyGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6d5dfc" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#b44dff" stop-opacity="0.6"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="softGlow">
+      <feGaussianBlur stdDeviation="20" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="#0c0c0f"/>
+
+  <!-- Subtle grid pattern -->
+  <g opacity="0.03">
+    <line x1="0" y1="0" x2="0" y2="630" stroke="#fff" stroke-width="1" transform="translate(60,0)"/>
+    <line x1="0" y1="0" x2="0" y2="630" stroke="#fff" stroke-width="1" transform="translate(120,0)"/>
+    <line x1="0" y1="0" x2="0" y2="630" stroke="#fff" stroke-width="1" transform="translate(180,0)"/>
+    <line x1="0" y1="0" x2="0" y2="630" stroke="#fff" stroke-width="1" transform="translate(240,0)"/>
+    <line x1="0" y1="0" x2="0" y2="630" stroke="#fff" stroke-width="1" transform="translate(300,0)"/>
+    <line x1="0" y1="0" x2="0" y2="630" stroke="#fff" stroke-width="1" transform="translate(360,0)"/>
+    <line x1="0" y1="0" x2="1200" y2="0" stroke="#fff" stroke-width="1" transform="translate(0,60)"/>
+    <line x1="0" y1="0" x2="1200" y2="0" stroke="#fff" stroke-width="1" transform="translate(0,120)"/>
+    <line x1="0" y1="0" x2="1200" y2="0" stroke="#fff" stroke-width="1" transform="translate(0,180)"/>
+    <line x1="0" y1="0" x2="1200" y2="0" stroke="#fff" stroke-width="1" transform="translate(0,240)"/>
+    <line x1="0" y1="0" x2="1200" y2="0" stroke="#fff" stroke-width="1" transform="translate(0,300)"/>
+    <line x1="0" y1="0" x2="1200" y2="0" stroke="#fff" stroke-width="1" transform="translate(0,360)"/>
+  </g>
+
+  <!-- Decorative gradient orb top-right -->
+  <circle cx="950" cy="120" r="200" fill="url(#keyGrad)" opacity="0.08" filter="url(#softGlow)"/>
+
+  <!-- Decorative gradient orb bottom-left -->
+  <circle cx="250" cy="520" r="150" fill="url(#keyGrad)" opacity="0.06" filter="url(#softGlow)"/>
+
+  <!-- Key icon -->
+  <g transform="translate(600, 220)" filter="url(#glow)">
+    <!-- Key head (circle) -->
+    <circle cx="0" cy="0" r="42" fill="none" stroke="url(#logoGrad)" stroke-width="5" opacity="0.8"/>
+    <circle cx="0" cy="0" r="28" fill="none" stroke="url(#logoGrad)" stroke-width="3" opacity="0.4"/>
+    <!-- Key shaft -->
+    <line x1="42" y1="0" x2="120" y2="0" stroke="url(#logoGrad)" stroke-width="5" stroke-linecap="round" opacity="0.8"/>
+    <!-- Key teeth -->
+    <line x1="95" y1="0" x2="95" y2="18" stroke="url(#logoGrad)" stroke-width="4" stroke-linecap="round" opacity="0.8"/>
+    <line x1="110" y1="0" x2="110" y2="14" stroke="url(#logoGrad)" stroke-width="4" stroke-linecap="round" opacity="0.8"/>
+  </g>
+
+  <!-- Logo text "jwx" -->
+  <text x="600" y="370" text-anchor="middle" font-family="'DM Mono', 'Fira Code', monospace" font-weight="700" font-size="120" fill="url(#logoGrad)" filter="url(#glow)">jwx</text>
+
+  <!-- Subtitle -->
+  <text x="600" y="430" text-anchor="middle" font-family="'Outfit', system-ui, sans-serif" font-weight="500" font-size="32" fill="#a1a1aa">Privacy-first JWT Decoder</text>
+
+  <!-- Tagline -->
+  <text x="600" y="480" text-anchor="middle" font-family="'Outfit', system-ui, sans-serif" font-weight="400" font-size="20" fill="#71717a">Decode tokens instantly in your browser</text>
+
+  <!-- Bottom accent line -->
+  <rect x="480" y="530" width="240" height="3" rx="1.5" fill="url(#logoGrad)" opacity="0.5"/>
+</svg>

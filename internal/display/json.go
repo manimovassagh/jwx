@@ -3,7 +3,7 @@ package display
 import (
 	"encoding/json"
 
-	"github.com/mani-sh-reddy/jwx/internal/jwt"
+	"github.com/manimovassagh/jwx/internal/jwt"
 )
 
 // JSONOutput represents the structured JSON output of a decoded token.

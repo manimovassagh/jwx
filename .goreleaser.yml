@@ -1,0 +1,45 @@
+version: 2
+
+project_name: jwx
+
+builds:
+  - main: ./cmd/jwx
+    binary: jwx
+    ldflags:
+      - -s -w
+      - -X main.version={{.Version}}
+      - -X main.commit={{.Commit}}
+      - -X main.date={{.Date}}
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+
+archives:
+  - format: tar.gz
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    format_overrides:
+      - goos: windows
+        format: zip
+
+brews:
+  - # TODO: Update with your Homebrew tap repository
+    repository:
+      owner: manimovassagh
+      name: homebrew-tap
+    homepage: "https://github.com/manimovassagh/jwx"
+    description: "JWX - JSON Web Token toolkit"
+    license: "MIT"
+    skip_upload: auto
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+      - "^ci:"
+      - "^chore:"

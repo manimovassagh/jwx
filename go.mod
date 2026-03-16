@@ -1,4 +1,4 @@
-module github.com/mani-sh-reddy/jwx
+module github.com/manimovassagh/jwx
 
 go 1.25.0
 

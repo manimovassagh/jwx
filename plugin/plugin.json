@@ -1,0 +1,5 @@
+{
+  "name": "jwx",
+  "description": "Decode, sign, verify, and audit JWT tokens with beautiful output",
+  "version": "0.1.0"
+}

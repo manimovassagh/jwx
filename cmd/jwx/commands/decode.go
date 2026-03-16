@@ -9,8 +9,8 @@ import (
 	"github.com/mattn/go-isatty"
 	"github.com/spf13/cobra"
 
-	"github.com/mani-sh-reddy/jwx/internal/display"
-	"github.com/mani-sh-reddy/jwx/internal/jwt"
+	"github.com/manimovassagh/jwx/internal/display"
+	"github.com/manimovassagh/jwx/internal/jwt"
 )
 
 var jsonOutput bool

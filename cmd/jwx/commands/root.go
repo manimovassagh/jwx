@@ -16,5 +16,6 @@ func Execute() error {
 
 func init() {
 	rootCmd.AddCommand(decodeCmd)
+	rootCmd.AddCommand(signCmd)
 	rootCmd.AddCommand(versionCmd)
 }

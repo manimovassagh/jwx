@@ -8,7 +8,7 @@ import (
 
 	"github.com/charmbracelet/lipgloss"
 	"github.com/dustin/go-humanize"
-	"github.com/mani-sh-reddy/jwx/internal/jwt"
+	"github.com/manimovassagh/jwx/internal/jwt"
 )
 
 var (

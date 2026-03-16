@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/mani-sh-reddy/jwx/cmd/jwx/commands"
+	"github.com/manimovassagh/jwx/cmd/jwx/commands"
 )
 
 // Set via -ldflags at build time.

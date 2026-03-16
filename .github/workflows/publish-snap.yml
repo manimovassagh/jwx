@@ -1,0 +1,33 @@
+name: Publish to Snap Store
+
+on:
+  workflow_call:
+    inputs:
+      version:
+        required: true
+        type: string
+    secrets:
+      SNAP_STORE_TOKEN:
+        required: true
+
+jobs:
+  publish:
+    name: Build and Publish Snap
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Install Snapcraft
+        run: sudo snap install snapcraft --classic
+
+      - name: Build Snap
+        env:
+          SNAP_VERSION: ${{ inputs.version }}
+        run: snapcraft --destructive-mode
+
+      - name: Push to Snap Store
+        env:
+          SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAP_STORE_TOKEN }}
+        run: snapcraft upload --release=stable *.snap

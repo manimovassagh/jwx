@@ -57,3 +57,12 @@ jobs:
       version: ${{ needs.release.outputs.version }}
     secrets:
       HOMEBREW_TAP_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+
+  snap:
+    name: Publish Snap
+    needs: release
+    uses: ./.github/workflows/publish-snap.yml
+    with:
+      version: ${{ needs.release.outputs.version }}
+    secrets:
+      SNAP_STORE_TOKEN: ${{ secrets.SNAP_STORE_TOKEN }}

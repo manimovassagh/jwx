@@ -3,1003 +3,453 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>jwx - JWT Decoder & Inspector</title>
-<meta name="description" content="Decode JSON Web Tokens instantly in your browser or terminal. Free, open-source, privacy-first JWT decoder with beautiful output.">
-<meta name="keywords" content="JWT, JSON Web Token, decoder, debugger, base64, token, auth, OAuth, CLI">
-<meta property="og:title" content="jwx - JWT Decoder & Inspector">
-<meta property="og:description" content="Decode JSON Web Tokens instantly in your browser or terminal. Free, open-source, privacy-first.">
+<title>jwx — JWT Decoder</title>
+<meta name="description" content="Decode JSON Web Tokens instantly in your browser. Free, open-source, privacy-first.">
+<meta property="og:title" content="jwx — JWT Decoder">
+<meta property="og:description" content="Decode JWTs instantly. Privacy-first, open source.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://manimovassagh.github.io/jwx/">
-<meta property="og:image" content="https://manimovassagh.github.io/jwx/og-image.png">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="jwx - JWT Decoder & Inspector">
-<meta name="twitter:description" content="Decode JSON Web Tokens instantly in your browser or terminal. Free, open-source, privacy-first.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#x1f511;</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-
 :root{
-  --bg:#09090b;
-  --bg-alt:#0c0c0f;
-  --card:#131316;
-  --card-hover:#1a1a1f;
-  --card-elevated:#18181c;
-  --border:rgba(255,255,255,0.06);
-  --border-hover:rgba(255,255,255,0.1);
-  --border-focus:rgba(99,102,241,0.5);
+  --bg:#0c0c0f;
+  --surface:#16161a;
+  --surface-2:#1e1e24;
+  --border:rgba(255,255,255,.06);
   --text:#fafafa;
-  --text-secondary:#a1a1aa;
   --muted:#71717a;
-  --blue:#818cf8;
-  --blue-bright:#a5b4fc;
-  --green:#4ade80;
-  --green-bright:#86efac;
-  --yellow:#fbbf24;
+  --accent:#6d5dfc;
+  --accent-2:#b44dff;
+  --green:#22c55e;
+  --green-bg:rgba(34,197,94,.08);
+  --red:#ef4444;
+  --red-bg:rgba(239,68,68,.08);
   --gold:#f59e0b;
-  --red:#f87171;
-  --purple:#c084fc;
-  --purple-bright:#d8b4fe;
-  --cyan:#22d3ee;
-  --accent-gradient:linear-gradient(135deg,#818cf8,#c084fc,#f0abfc);
-  --font-sans:'Inter',system-ui,-apple-system,sans-serif;
-  --font-mono:'JetBrains Mono','Fira Code',monospace;
-  --radius-sm:8px;
-  --radius-md:12px;
-  --radius-lg:16px;
-  --radius-xl:20px;
-  --radius-2xl:24px;
-  --shadow-sm:0 1px 2px rgba(0,0,0,0.3);
-  --shadow-md:0 4px 16px rgba(0,0,0,0.4);
-  --shadow-lg:0 8px 32px rgba(0,0,0,0.5);
-  --shadow-xl:0 16px 48px rgba(0,0,0,0.6);
-  --shadow-glow:0 0 40px rgba(129,140,248,0.15);
+  /* Light decoder */
+  --dec-bg:#ffffff;
+  --dec-surface:#f8f8fa;
+  --dec-border:#e4e4e7;
+  --dec-text:#18181b;
+  --dec-muted:#71717a;
+  --key:#4f46e5;
+  --str:#15803d;
+  --num:#b45309;
+  --bool:#7c3aed;
+  --font:'Outfit',system-ui,sans-serif;
+  --mono:'DM Mono','Fira Code',monospace;
 }
+html{font-size:15px}
+body{background:var(--bg);color:var(--text);font-family:var(--font);overflow:hidden;height:100vh;width:100vw}
 
-html{font-size:16px;scroll-behavior:smooth}
-body{
-  background:var(--bg);color:var(--text);font-family:var(--font-sans);
-  line-height:1.6;min-height:100vh;overflow-x:hidden;
-  -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
-}
-a{color:var(--blue-bright);text-decoration:none;transition:color .2s}
-a:hover{color:#c7d2fe}
+/* ─── LAYOUT: Full viewport, no scroll ─── */
+.app{display:flex;flex-direction:column;height:100vh;width:100vw;overflow:hidden}
 
-.container{max-width:1000px;margin:0 auto;padding:0 1.5rem;width:100%}
+/* ─── HEADER ─── */
+.header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:.6rem 1.5rem;background:var(--surface);border-bottom:1px solid var(--border);
+  flex-shrink:0;z-index:10;
+}
+.logo{
+  font-family:var(--mono);font-weight:500;font-size:1.4rem;
+  background:linear-gradient(135deg,var(--accent),var(--accent-2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  letter-spacing:-.03em;
+}
+.header-right{display:flex;align-items:center;gap:1rem}
+.header-right a{color:var(--muted);font-size:.8rem;transition:color .2s;font-weight:500}
+.header-right a:hover{color:var(--text);text-decoration:none}
+.badge-row{display:flex;gap:.5rem;align-items:center}
+.badge-row img{height:18px;opacity:.8;transition:opacity .2s}
+.badge-row a:hover img{opacity:1}
+.privacy-dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);animation:pulse 3s infinite}
+@keyframes pulse{0%,100%{opacity:.5}50%{opacity:1}}
 
-/* ─── Animated Background ─── */
-.hero-bg{
-  position:absolute;top:0;left:0;right:0;bottom:0;overflow:hidden;pointer-events:none;
-}
-.hero-bg::before{
-  content:'';position:absolute;top:-30%;left:50%;transform:translateX(-50%);
-  width:800px;height:800px;
-  background:radial-gradient(circle,rgba(129,140,248,0.12) 0%,rgba(192,132,252,0.06) 40%,transparent 70%);
-  animation:breathe 8s ease-in-out infinite;
-}
-.hero-bg::after{
-  content:'';position:absolute;bottom:-20%;right:-10%;
-  width:600px;height:600px;
-  background:radial-gradient(circle,rgba(192,132,252,0.08) 0%,transparent 60%);
-  animation:breathe 10s ease-in-out infinite reverse;
-}
-@keyframes breathe{
-  0%,100%{opacity:0.6;transform:translateX(-50%) scale(1)}
-  50%{opacity:1;transform:translateX(-50%) scale(1.1)}
-}
+/* ─── MAIN SPLIT ─── */
+.main{display:grid;grid-template-columns:1fr 1fr;flex:1;overflow:hidden}
 
-/* Floating dots */
-.dots{position:absolute;top:0;left:0;right:0;bottom:0;overflow:hidden;pointer-events:none}
-.dot{
-  position:absolute;width:2px;height:2px;background:rgba(129,140,248,0.3);border-radius:50%;
-  animation:float linear infinite;
+/* ─── LEFT: ENCODED (dark) ─── */
+.panel-left{
+  display:flex;flex-direction:column;padding:1.5rem;
+  background:var(--surface);border-right:1px solid var(--border);overflow:hidden;
 }
-@keyframes float{
-  0%{transform:translateY(0) translateX(0);opacity:0}
-  10%{opacity:1}
-  90%{opacity:1}
-  100%{transform:translateY(-100vh) translateX(20px);opacity:0}
+.panel-label{
+  font-size:.7rem;font-weight:600;color:var(--muted);text-transform:uppercase;
+  letter-spacing:.12em;margin-bottom:.75rem;display:flex;align-items:center;gap:.5rem;
 }
-
-/* ─── Animations ─── */
-@keyframes fadeUp{
-  from{opacity:0;transform:translateY(40px)}
-  to{opacity:1;transform:translateY(0)}
+.panel-label span{font-family:var(--mono)}
+.encoded-area{
+  flex:1;width:100%;background:var(--bg);border:1px solid var(--border);
+  border-radius:10px;color:var(--text);font-family:var(--mono);font-size:.82rem;
+  padding:1rem;resize:none;outline:none;line-height:1.7;
+  transition:border-color .3s,box-shadow .3s;
 }
-@keyframes fadeIn{from{opacity:0}to{opacity:1}}
-@keyframes shimmer{
-  0%{background-position:200% center}
-  100%{background-position:-200% center}
+.encoded-area:focus{
+  border-color:rgba(109,93,252,.4);
+  box-shadow:0 0 0 3px rgba(109,93,252,.1),0 0 30px rgba(109,93,252,.05);
 }
-@keyframes glowPulse{
-  0%,100%{box-shadow:0 0 20px rgba(129,140,248,0.08),0 0 60px rgba(129,140,248,0.04),inset 0 0 0 1px rgba(129,140,248,0.15)}
-  50%{box-shadow:0 0 30px rgba(129,140,248,0.15),0 0 80px rgba(129,140,248,0.08),inset 0 0 0 1px rgba(129,140,248,0.3)}
-}
-@keyframes slideIn{
-  from{opacity:0;transform:translateY(20px)}
-  to{opacity:1;transform:translateY(0)}
-}
-@keyframes badgePulse{
-  0%,100%{opacity:0.9}
-  50%{opacity:1}
-}
-
-.fade-up{animation:fadeUp .8s cubic-bezier(0.16,1,0.3,1) both}
-.fade-up-d1{animation-delay:.12s}
-.fade-up-d2{animation-delay:.24s}
-.fade-up-d3{animation-delay:.36s}
-.fade-up-d4{animation-delay:.48s}
-.fade-up-d5{animation-delay:.6s}
-.fade-in{animation:fadeIn .6s ease-out both}
-
-/* Intersection Observer fade-in */
-.reveal{opacity:0;transform:translateY(30px);transition:opacity .7s cubic-bezier(0.16,1,0.3,1),transform .7s cubic-bezier(0.16,1,0.3,1)}
-.reveal.visible{opacity:1;transform:translateY(0)}
-
-/* ─── Section Divider ─── */
-.section-divider{
-  height:1px;border:none;margin:0;
-  background:linear-gradient(90deg,transparent,rgba(129,140,248,0.3),rgba(192,132,252,0.3),transparent);
-}
-
-/* ─── Hero ─── */
-.hero{padding:8rem 0 5rem;text-align:center;position:relative}
-.hero-logo{
-  font-size:7rem;font-weight:900;font-family:var(--font-mono);
-  background:linear-gradient(135deg,#818cf8 0%,#c084fc 35%,#f0abfc 65%,#818cf8 100%);
-  background-size:300% 300%;
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
-  letter-spacing:-0.06em;margin-bottom:1rem;
-  animation:shimmer 8s linear infinite;
-  line-height:1.1;
-  filter:drop-shadow(0 0 60px rgba(129,140,248,0.3));
-}
-.hero-tagline{
-  color:var(--text-secondary);font-size:1.35rem;max-width:560px;margin:0 auto 2.5rem;
-  line-height:1.7;font-weight:400;letter-spacing:-0.01em;
-}
-.hero-tagline strong{color:var(--text);font-weight:600}
-.hero-buttons{display:flex;gap:0.75rem;justify-content:center;flex-wrap:wrap;margin-bottom:2.5rem}
-
-.btn{
-  cursor:pointer;border:none;border-radius:var(--radius-md);font-family:var(--font-sans);
-  font-size:0.9rem;font-weight:600;padding:0.8rem 2rem;transition:all .25s cubic-bezier(0.16,1,0.3,1);
-  display:inline-flex;align-items:center;gap:0.5rem;text-decoration:none;
-  position:relative;overflow:hidden;
-}
-.btn-primary{
-  background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;
-  box-shadow:0 4px 20px rgba(99,102,241,0.3),0 1px 3px rgba(0,0,0,0.2);
-}
-.btn-primary:hover{
-  transform:translateY(-2px);
-  box-shadow:0 8px 30px rgba(99,102,241,0.4),0 2px 6px rgba(0,0,0,0.3);
-  color:#fff;
-}
-.btn-primary:active{transform:translateY(0)}
-.btn-outline{
-  background:rgba(255,255,255,0.04);color:var(--text);
-  border:1px solid rgba(255,255,255,0.1);
-  backdrop-filter:blur(10px);
-}
-.btn-outline:hover{
-  border-color:rgba(255,255,255,0.2);background:rgba(255,255,255,0.08);
-  color:var(--text);transform:translateY(-2px);
-  box-shadow:var(--shadow-md);
-}
-
-.badge-row{
-  display:flex;gap:0.75rem;justify-content:center;flex-wrap:wrap;
-  padding:1rem 1.5rem;border-radius:var(--radius-xl);
-  background:rgba(255,255,255,0.02);border:1px solid var(--border);
-  display:inline-flex;
-  animation:badgePulse 4s ease-in-out infinite;
-}
-.badge-row a{display:flex;align-items:center;transition:transform .2s}
-.badge-row a img{height:22px;transition:all .2s}
-.badge-row a:hover{transform:scale(1.05)}
-.badge-row a:hover img{filter:brightness(1.2)}
-.badge-wrapper{display:flex;justify-content:center}
-
-/* ─── Decoder Section ─── */
-.decoder-section{padding:4rem 0 5rem}
-.decoder-title{
-  font-size:2rem;font-weight:800;margin-bottom:0.5rem;text-align:center;
-  letter-spacing:-0.02em;
-}
-.decoder-title span{
-  background:var(--accent-gradient);-webkit-background-clip:text;
-  -webkit-text-fill-color:transparent;background-clip:text;
-}
-.decoder-subtitle{
-  color:var(--muted);text-align:center;margin-bottom:2.5rem;font-size:1rem;
-}
-
-.input-card{
-  background:var(--card);border:1px solid var(--border);border-radius:var(--radius-2xl);
-  padding:2rem;margin-bottom:2rem;transition:all .4s cubic-bezier(0.16,1,0.3,1);
-  box-shadow:var(--shadow-md);
-}
-.input-card:focus-within{
-  border-color:var(--border-focus);
-  box-shadow:0 0 0 4px rgba(99,102,241,0.1),0 0 40px rgba(99,102,241,0.08),var(--shadow-lg);
-}
-.input-label{
-  display:flex;align-items:center;gap:0.5rem;
-  font-weight:600;margin-bottom:1rem;font-size:0.8rem;
-  color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;
-}
-.input-label::before{
-  content:'';display:inline-block;width:6px;height:6px;border-radius:50%;
-  background:var(--blue);box-shadow:0 0 8px var(--blue);
-}
-textarea{
-  width:100%;min-height:140px;background:var(--bg);border:1px solid rgba(255,255,255,0.06);
-  border-radius:var(--radius-lg);color:var(--text);font-family:var(--font-mono);
-  font-size:0.85rem;padding:1.25rem;resize:vertical;outline:none;
-  transition:border-color .3s,box-shadow .3s;line-height:1.7;
-}
-textarea:focus{
-  border-color:rgba(99,102,241,0.4);
-  box-shadow:0 0 0 3px rgba(99,102,241,0.08),inset 0 0 20px rgba(99,102,241,0.03);
-}
-textarea::placeholder{color:#3f3f46}
-
-/* ─── Sample Pills ─── */
-.sample-pills{display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:1.25rem}
+.encoded-area::placeholder{color:#3f3f46}
+.pill-row{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.75rem}
 .pill{
-  cursor:pointer;border:1px solid rgba(255,255,255,0.08);border-radius:100px;
-  font-family:var(--font-sans);font-size:0.78rem;font-weight:500;
-  padding:0.45rem 1rem;color:var(--text-secondary);background:rgba(255,255,255,0.03);
-  transition:all .2s cubic-bezier(0.16,1,0.3,1);
-  display:inline-flex;align-items:center;gap:0.4rem;
-  white-space:nowrap;
+  cursor:pointer;background:var(--surface-2);border:1px solid var(--border);
+  border-radius:100px;font-family:var(--font);font-size:.7rem;font-weight:500;
+  padding:.3rem .75rem;color:var(--muted);transition:all .15s;
+  display:flex;align-items:center;gap:.35rem;
 }
-.pill:hover{
-  border-color:rgba(129,140,248,0.3);color:var(--text);
-  background:rgba(129,140,248,0.08);transform:translateY(-1px);
-  box-shadow:0 4px 12px rgba(0,0,0,0.2);
-}
-.pill.active{
-  border-color:rgba(129,140,248,0.5);color:var(--blue-bright);
-  background:rgba(129,140,248,0.1);
-}
+.pill:hover{border-color:rgba(109,93,252,.4);color:var(--text);background:rgba(109,93,252,.08)}
+.pill.active{border-color:var(--accent);color:#c4b5fd;background:rgba(109,93,252,.12)}
 .pill-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
-.pill-dot.blue{background:#818cf8}
-.pill-dot.purple{background:#c084fc}
-.pill-dot.red{background:#f87171}
-.pill-dot.green{background:#4ade80}
-.pill-dot.cyan{background:#22d3ee}
 
-.action-row{display:flex;gap:0.5rem;margin-top:1rem}
-.btn-action{
-  cursor:pointer;border:none;border-radius:var(--radius-sm);font-family:var(--font-sans);
-  font-size:0.82rem;font-weight:600;padding:0.6rem 1.5rem;
-  transition:all .2s cubic-bezier(0.16,1,0.3,1);
+/* ─── RIGHT: DECODED (light) ─── */
+.panel-right{
+  display:flex;flex-direction:column;overflow-y:auto;overflow-x:hidden;
+  background:var(--dec-bg);color:var(--dec-text);
 }
-.btn-decode{
-  background:linear-gradient(135deg,#6366f1,#7c3aed);color:#fff;
-  box-shadow:0 2px 8px rgba(99,102,241,0.3);
+.decoded-header{
+  padding:1rem 1.5rem .75rem;display:flex;align-items:center;justify-content:space-between;
+  border-bottom:1px solid var(--dec-border);flex-shrink:0;
+  background:var(--dec-bg);position:sticky;top:0;z-index:5;
 }
-.btn-decode:hover{box-shadow:0 4px 16px rgba(99,102,241,0.4);transform:translateY(-1px)}
-.btn-clear{background:rgba(255,255,255,0.05);color:var(--text-secondary);border:1px solid var(--border)}
-.btn-clear:hover{background:rgba(255,255,255,0.08);color:var(--text)}
-
-/* Status */
-.status-bar{display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap;margin-bottom:1.5rem;min-height:0}
-.status-bar:empty{margin-bottom:0}
-.alg-badge,.expiry-badge{
-  display:inline-flex;align-items:center;gap:0.35rem;padding:0.35rem 1rem;border-radius:100px;
-  font-size:0.75rem;font-weight:600;font-family:var(--font-mono);
-  backdrop-filter:blur(10px);
-}
+.decoded-label{font-size:.7rem;font-weight:600;color:var(--dec-muted);text-transform:uppercase;letter-spacing:.12em}
+.status-badges{display:flex;gap:.4rem;flex-wrap:wrap}
 .alg-badge{
-  background:rgba(129,140,248,0.1);color:var(--blue-bright);
-  border:1px solid rgba(129,140,248,0.2);
-  box-shadow:0 0 12px rgba(129,140,248,0.08);
+  font-family:var(--mono);font-size:.68rem;font-weight:500;
+  padding:.25rem .65rem;border-radius:100px;
+  background:rgba(79,70,229,.08);color:#4f46e5;border:1px solid rgba(79,70,229,.15);
 }
-.expiry-badge.valid{
-  background:rgba(74,222,128,0.1);color:var(--green-bright);
-  border:1px solid rgba(74,222,128,0.2);
-  box-shadow:0 0 12px rgba(74,222,128,0.08);
+.exp-badge{
+  font-family:var(--mono);font-size:.68rem;font-weight:500;
+  padding:.25rem .65rem;border-radius:100px;
 }
-.expiry-badge.expired{
-  background:rgba(248,113,113,0.1);color:var(--red);
-  border:1px solid rgba(248,113,113,0.2);
-  box-shadow:0 0 12px rgba(248,113,113,0.08);
-}
+.exp-badge.valid{background:var(--green-bg);color:var(--green);border:1px solid rgba(34,197,94,.2)}
+.exp-badge.expired{background:var(--red-bg);color:var(--red);border:1px solid rgba(239,68,68,.2)}
 
-/* Decoded sections */
-.decoded{display:none}
-.decoded.show{display:block}
-.decoded.show .section{animation:slideIn .4s cubic-bezier(0.16,1,0.3,1) both}
-.decoded.show .section:nth-child(1){animation-delay:0s}
-.decoded.show .section:nth-child(2){animation-delay:.1s}
-.decoded.show .section:nth-child(3){animation-delay:.2s}
+.decoded-body{padding:.75rem 1.5rem 1.5rem;flex:1}
 
+/* Section cards */
 .section{
-  background:var(--card);border-radius:var(--radius-xl);border:1px solid var(--border);
-  margin-bottom:1.25rem;overflow:hidden;transition:all .3s;
-  box-shadow:var(--shadow-md);
+  background:var(--dec-surface);border:1px solid var(--dec-border);
+  border-radius:10px;margin-bottom:.75rem;overflow:hidden;
+  transition:box-shadow .2s;
 }
-.section:hover{border-color:var(--border-hover);box-shadow:var(--shadow-lg)}
-.section-header{
+.section:hover{box-shadow:0 2px 12px rgba(0,0,0,.04)}
+.section.header-s{border-left:3px solid #6366f1}
+.section.payload-s{border-left:3px solid #22c55e}
+.section.sig-s{border-left:3px solid var(--gold)}
+
+.section-top{
   display:flex;align-items:center;justify-content:space-between;
-  padding:1rem 1.5rem;border-bottom:1px solid var(--border);
-  background:rgba(255,255,255,0.015);
+  padding:.6rem 1rem;border-bottom:1px solid var(--dec-border);
+  background:rgba(0,0,0,.015);
 }
-.section-label{font-weight:700;font-size:0.85rem;display:flex;align-items:center;gap:0.6rem;letter-spacing:0.02em}
-.section-dot{width:10px;height:10px;border-radius:50%;display:inline-block;box-shadow:0 0 8px currentColor}
-.section.header-section{border-left:3px solid var(--blue)}
-.section.header-section .section-dot{background:var(--blue);color:var(--blue)}
-.section.payload-section{border-left:3px solid var(--green)}
-.section.payload-section .section-dot{background:var(--green);color:var(--green)}
-.section.signature-section{border-left:3px solid var(--gold)}
-.section.signature-section .section-dot{background:var(--gold);color:var(--gold)}
-.section-body{padding:1.5rem 1.75rem;overflow-x:auto}
-pre{font-family:var(--font-mono);font-size:0.82rem;line-height:2;white-space:pre-wrap;word-break:break-all}
-
-/* Copy button */
-.btn-copy{
-  cursor:pointer;background:rgba(255,255,255,0.04);border:1px solid var(--border);
-  color:var(--muted);padding:0.35rem 0.85rem;font-size:0.73rem;border-radius:var(--radius-sm);
-  font-family:var(--font-sans);font-weight:600;transition:all .2s;
-  min-width:68px;text-align:center;letter-spacing:0.02em;
-  display:inline-flex;align-items:center;gap:0.35rem;justify-content:center;
+.section-name{font-size:.75rem;font-weight:600;display:flex;align-items:center;gap:.5rem;color:var(--dec-text)}
+.sec-dot{width:7px;height:7px;border-radius:50%;display:inline-block}
+.sec-dot.blue{background:#6366f1}
+.sec-dot.green{background:#22c55e}
+.sec-dot.gold{background:var(--gold)}
+.copy-btn{
+  cursor:pointer;background:transparent;border:1px solid var(--dec-border);
+  color:var(--dec-muted);padding:.2rem .6rem;font-size:.65rem;border-radius:6px;
+  font-family:var(--font);font-weight:500;transition:all .15s;
 }
-.btn-copy:hover{border-color:rgba(255,255,255,0.15);color:var(--text);background:rgba(255,255,255,0.06)}
-.btn-copy.copied{border-color:rgba(74,222,128,0.3);color:var(--green);background:rgba(74,222,128,0.06)}
+.copy-btn:hover{border-color:#a1a1aa;color:var(--dec-text)}
+.copy-btn.done{border-color:var(--green);color:var(--green)}
 
-/* JSON highlighting */
-.json-key{color:#93c5fd;font-weight:500}
-.json-string{color:#86efac}
-.json-number{color:#fcd34d}
-.json-bool,.json-null{color:var(--purple-bright)}
-
+.section-content{padding:.75rem 1rem;overflow-x:auto}
+pre{font-family:var(--mono);font-size:.78rem;line-height:1.9;white-space:pre-wrap;word-break:break-all;color:var(--dec-text)}
+.json-key{color:var(--key);font-weight:500}
+.json-str{color:var(--str)}
+.json-num{color:var(--num)}
+.json-bool{color:var(--bool)}
 .json-ts{
-  color:var(--text-secondary);font-size:0.72rem;display:block;
-  padding:0.3rem 0 0.3rem 1.5rem;margin:0.1rem 0;
-  border-left:2px solid rgba(129,140,248,0.2);
-  background:linear-gradient(90deg,rgba(129,140,248,0.04),transparent);
-  border-radius:0 var(--radius-sm) var(--radius-sm) 0;
-  font-style:normal;letter-spacing:0.01em;
-}
-.json-ts-icon{color:var(--blue);margin-right:0.35rem;font-style:normal}
-
-/* Error */
-.error-msg{
-  background:rgba(248,113,113,0.06);border:1px solid rgba(248,113,113,0.15);
-  border-radius:var(--radius-lg);padding:1rem 1.5rem;color:var(--red);font-size:0.9rem;
-  margin-bottom:1.25rem;display:none;
-}
-.error-msg.show{display:flex;align-items:center;gap:0.75rem;animation:fadeIn .3s}
-.error-icon{
-  font-weight:700;background:var(--red);color:#fff;width:22px;height:22px;
-  border-radius:50%;display:flex;align-items:center;justify-content:center;
-  font-size:0.7rem;flex-shrink:0;
+  display:block;font-size:.68rem;color:var(--dec-muted);
+  padding:.15rem 0 .15rem 1rem;margin:.1rem 0;
+  border-left:2px solid rgba(109,93,252,.2);
+  background:linear-gradient(90deg,rgba(109,93,252,.03),transparent);
 }
 
-/* ─── Features Section ─── */
-.features-section{padding:5rem 0}
-.section-heading{
-  font-size:2.25rem;font-weight:800;text-align:center;margin-bottom:0.6rem;
-  letter-spacing:-0.03em;
+/* Empty / error state */
+.empty-state{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  height:100%;color:var(--dec-muted);text-align:center;padding:2rem;
 }
-.section-subheading{
-  color:var(--muted);text-align:center;margin-bottom:3.5rem;font-size:1.05rem;
-  max-width:500px;margin-left:auto;margin-right:auto;
+.empty-icon{font-size:2.5rem;margin-bottom:.75rem;opacity:.4}
+.empty-text{font-size:.9rem;line-height:1.5}
+.error-state{
+  background:var(--red-bg);border:1px solid rgba(239,68,68,.15);
+  border-radius:8px;padding:.75rem 1rem;color:var(--red);font-size:.82rem;
+  margin-bottom:.75rem;
 }
 
-.features-grid{
-  display:grid;grid-template-columns:repeat(2,1fr);gap:1.25rem;
-}
-.feature-card{
-  background:var(--card);border:1px solid var(--border);border-radius:var(--radius-xl);
-  padding:2rem;transition:all .4s cubic-bezier(0.16,1,0.3,1);position:relative;overflow:hidden;
-}
-.feature-card::before{
-  content:'';position:absolute;top:0;left:0;right:0;height:1px;
-  background:linear-gradient(90deg,transparent,var(--blue),var(--purple),transparent);
-  opacity:0;transition:opacity .4s;
-}
-.feature-card::after{
-  content:'';position:absolute;inset:0;border-radius:var(--radius-xl);
-  background:radial-gradient(300px circle at var(--mouse-x,50%) var(--mouse-y,0%),rgba(129,140,248,0.04),transparent);
-  pointer-events:none;opacity:0;transition:opacity .4s;
-}
-.feature-card:hover{
-  border-color:rgba(255,255,255,0.1);transform:translateY(-6px);
-  box-shadow:0 20px 40px rgba(0,0,0,0.4),0 0 40px rgba(129,140,248,0.05);
-}
-.feature-card:hover::before{opacity:1}
-.feature-card:hover::after{opacity:1}
-.feature-icon{
-  font-size:1.5rem;margin-bottom:1rem;display:flex;align-items:center;justify-content:center;
-  width:52px;height:52px;border-radius:var(--radius-md);
-  background:rgba(129,140,248,0.06);border:1px solid rgba(129,140,248,0.1);
-  transition:all .3s;
-}
-.feature-card:hover .feature-icon{transform:scale(1.05);box-shadow:0 0 20px rgba(129,140,248,0.1)}
-.feature-card:nth-child(2) .feature-icon{background:rgba(74,222,128,0.06);border-color:rgba(74,222,128,0.1)}
-.feature-card:nth-child(2):hover .feature-icon{box-shadow:0 0 20px rgba(74,222,128,0.1)}
-.feature-card:nth-child(3) .feature-icon{background:rgba(192,132,252,0.06);border-color:rgba(192,132,252,0.1)}
-.feature-card:nth-child(3):hover .feature-icon{box-shadow:0 0 20px rgba(192,132,252,0.1)}
-.feature-card:nth-child(4) .feature-icon{background:rgba(251,191,36,0.06);border-color:rgba(251,191,36,0.1)}
-.feature-card:nth-child(4):hover .feature-icon{box-shadow:0 0 20px rgba(251,191,36,0.1)}
-.feature-title{font-weight:700;font-size:1.05rem;margin-bottom:0.4rem;letter-spacing:-0.01em}
-.feature-desc{color:var(--text-secondary);font-size:0.9rem;line-height:1.6}
-
-/* ─── Install Section ─── */
-.install-section{padding:5rem 0}
-.install-card{
-  background:var(--card);border:1px solid var(--border);border-radius:var(--radius-2xl);
-  padding:2.5rem;text-align:center;max-width:680px;margin:0 auto;
-  box-shadow:var(--shadow-lg);position:relative;overflow:hidden;
-}
-.install-card::before{
-  content:'';position:absolute;top:0;left:0;right:0;height:1px;
-  background:linear-gradient(90deg,transparent,rgba(129,140,248,0.4),rgba(192,132,252,0.4),transparent);
-}
-.install-label{
-  font-size:0.8rem;font-weight:600;color:var(--muted);text-transform:uppercase;
-  letter-spacing:0.12em;margin-bottom:1.25rem;
-}
-.install-cmd{
-  background:var(--bg);border:1px solid rgba(255,255,255,0.06);border-radius:var(--radius-lg);
-  padding:1.15rem 1.5rem;font-family:var(--font-mono);font-size:0.85rem;
-  display:flex;align-items:center;justify-content:space-between;gap:1rem;
-  text-align:left;transition:border-color .3s;
-}
-.install-cmd:hover{border-color:rgba(255,255,255,0.1)}
-.install-cmd code{color:var(--text);white-space:nowrap;overflow-x:auto}
-.install-cmd code .prompt{color:var(--green);font-weight:600}
-.install-cmd .btn-copy{flex-shrink:0}
-.install-note{color:var(--muted);font-size:0.82rem;margin-top:1.25rem;line-height:1.6}
-
-/* ─── Footer ─── */
-footer{padding:3.5rem 0 3rem}
-.footer-inner{
+/* ─── FOOTER BAR ─── */
+.footer{
   display:flex;align-items:center;justify-content:space-between;
-  flex-wrap:wrap;gap:1rem;
+  padding:.4rem 1.5rem;background:var(--surface);border-top:1px solid var(--border);
+  flex-shrink:0;font-size:.7rem;color:var(--muted);
 }
-.footer-left{display:flex;align-items:center;gap:1.5rem}
-.footer-brand{
-  font-family:var(--font-mono);font-weight:800;font-size:1.15rem;
-  background:var(--accent-gradient);
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+.footer a{color:var(--muted);transition:color .15s}
+.footer a:hover{color:var(--text);text-decoration:none}
+.footer-links{display:flex;gap:1rem}
+.footer-install{
+  font-family:var(--mono);font-size:.68rem;color:#52525b;
+  background:var(--bg);padding:.25rem .6rem;border-radius:6px;border:1px solid var(--border);
+  cursor:pointer;transition:all .15s;
 }
-.footer-links{display:flex;gap:1.5rem;font-size:0.85rem}
-.footer-links a{color:var(--muted);transition:color .2s}
-.footer-links a:hover{color:var(--text)}
-.footer-right{display:flex;align-items:center;gap:1.5rem;color:var(--muted);font-size:0.82rem}
-.footer-right a{color:var(--muted)}
-.footer-right a:hover{color:var(--text)}
-.footer-go{display:inline-flex;align-items:center;gap:0.35rem}
-.footer-privacy{
-  color:var(--muted);font-size:0.78rem;text-align:center;margin-top:2rem;
-  padding-top:2rem;border-top:1px solid var(--border);
-  display:flex;align-items:center;justify-content:center;gap:0.5rem;
-}
-.footer-privacy-dot{
-  width:6px;height:6px;border-radius:50%;background:var(--green);
-  box-shadow:0 0 8px var(--green);animation:blink 3s ease-in-out infinite;
-}
-@keyframes blink{
-  0%,100%{opacity:0.4}
-  50%{opacity:1}
-}
+.footer-install:hover{border-color:rgba(109,93,252,.3);color:var(--text)}
 
-/* ─── Responsive ─── */
+/* ─── MOBILE ─── */
 @media(max-width:768px){
-  .hero{padding:5rem 0 3.5rem}
-  .hero-logo{font-size:4.5rem}
-  .hero-tagline{font-size:1.1rem}
-  .features-grid{grid-template-columns:1fr}
-  .footer-inner{flex-direction:column;text-align:center}
-  .footer-left{flex-direction:column}
-  .sample-pills{justify-content:center}
-  .section-heading{font-size:1.75rem}
-}
-@media(max-width:480px){
-  .hero-logo{font-size:3.5rem}
-  .hero-tagline{font-size:0.95rem}
-  textarea{min-height:110px;font-size:0.78rem;padding:1rem}
-  pre{font-size:0.72rem}
-  .section-body{padding:1rem 1.25rem}
-  .btn{padding:0.7rem 1.5rem;font-size:0.82rem}
-  .install-cmd{flex-direction:column;text-align:center;gap:0.75rem}
-  .install-cmd code{font-size:0.75rem;white-space:normal;word-break:break-all}
-  .input-card{padding:1.5rem}
-  .container{padding:0 1rem}
-  .pill{font-size:0.72rem;padding:0.35rem 0.75rem}
+  .main{grid-template-columns:1fr;grid-template-rows:1fr 1fr}
+  body{overflow:auto}
+  .app{height:auto;min-height:100vh}
+  .badge-row{display:none}
+  .panel-left,.panel-right{overflow:visible}
+  .panel-left{border-right:none;border-bottom:1px solid var(--border)}
 }
 </style>
 </head>
 <body>
+<div class="app">
 
-<!-- ─── Hero ─── -->
-<section class="hero">
-  <div class="hero-bg"></div>
-  <div class="dots" id="dots"></div>
-  <div class="container" style="position:relative;z-index:1">
-    <div class="hero-logo fade-up">jwx</div>
-    <p class="hero-tagline fade-up fade-up-d1">Decode <strong>JSON Web Tokens</strong> instantly &mdash; in your browser or terminal. <strong>Privacy-first</strong>, open source.</p>
-    <div class="hero-buttons fade-up fade-up-d2">
-      <a href="#decoder" class="btn btn-primary">Decode a Token</a>
-      <a href="https://github.com/manimovassagh/jwx" class="btn btn-outline">View on GitHub</a>
+  <!-- HEADER -->
+  <header class="header">
+    <div style="display:flex;align-items:center;gap:.75rem">
+      <span class="logo">jwx</span>
+      <span style="color:var(--muted);font-size:.7rem;font-weight:500">JWT Decoder</span>
     </div>
-    <div class="badge-wrapper fade-up fade-up-d3">
+    <div class="header-right">
       <div class="badge-row">
-        <a href="https://github.com/manimovassagh/jwx/actions/workflows/ci.yml"><img src="https://github.com/manimovassagh/jwx/actions/workflows/ci.yml/badge.svg" alt="CI" width="auto" height="22"></a>
-        <a href="https://github.com/manimovassagh/jwx/releases"><img src="https://img.shields.io/github/v/release/manimovassagh/jwx?include_prereleases&style=flat-square&color=6366f1" alt="Release" width="auto" height="22"></a>
-        <a href="https://github.com/manimovassagh/jwx/blob/main/LICENSE"><img src="https://img.shields.io/github/license/manimovassagh/jwx?style=flat-square&color=8b5cf6" alt="License" width="auto" height="22"></a>
+        <a href="https://github.com/manimovassagh/jwx/actions/workflows/ci.yml"><img src="https://github.com/manimovassagh/jwx/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+        <a href="https://github.com/manimovassagh/jwx/releases"><img src="https://img.shields.io/github/v/release/manimovassagh/jwx?style=flat-square&color=6d5dfc" alt="Release"></a>
       </div>
+      <span class="privacy-dot" title="Client-side only"></span>
+      <a href="https://github.com/manimovassagh/jwx">GitHub ↗</a>
     </div>
-  </div>
-</section>
+  </header>
 
-<hr class="section-divider">
+  <!-- SPLIT PANES -->
+  <div class="main">
 
-<!-- ─── Decoder ─── -->
-<section class="decoder-section" id="decoder">
-  <div class="container">
-    <h2 class="decoder-title reveal"><span>&gt;_</span> JWT Decoder</h2>
-    <p class="decoder-subtitle reveal">Paste a token or try a sample below</p>
-
-    <div class="input-card reveal">
-      <label class="input-label" for="jwt-input">Token Input</label>
-      <textarea id="jwt-input" placeholder="Paste your JWT here... supports raw tokens and Bearer prefix" spellcheck="false" autocomplete="off"></textarea>
-
-      <div class="sample-pills" id="sample-pills"></div>
-
-      <div class="action-row">
-        <button class="btn-action btn-decode" onclick="decode()">Decode</button>
-        <button class="btn-action btn-clear" onclick="clearAll()">Clear</button>
-      </div>
+    <!-- LEFT: Encoded JWT (dark) -->
+    <div class="panel-left">
+      <div class="panel-label"><span>Encoded</span> — paste or pick a sample</div>
+      <textarea class="encoded-area" id="input" spellcheck="false" autocomplete="off" placeholder="Paste a JWT here..."></textarea>
+      <div class="pill-row" id="pills"></div>
     </div>
 
-    <div id="error" class="error-msg"><span class="error-icon">!</span><span id="error-text"></span></div>
-
-    <div id="status" class="status-bar"></div>
-
-    <div id="decoded" class="decoded">
-      <div class="section header-section">
-        <div class="section-header">
-          <span class="section-label"><span class="section-dot"></span>Header</span>
-          <button class="btn-copy" id="copy-header" onclick="copySection('header')">Copy</button>
+    <!-- RIGHT: Decoded (light) -->
+    <div class="panel-right">
+      <div class="decoded-header">
+        <span class="decoded-label">Decoded</span>
+        <div class="status-badges" id="badges"></div>
+      </div>
+      <div class="decoded-body" id="output">
+        <div class="empty-state" id="empty">
+          <div class="empty-icon">🔑</div>
+          <div class="empty-text">Paste a JWT on the left<br>or pick a sample below</div>
         </div>
-        <div class="section-body"><pre id="header-json"></pre></div>
-      </div>
-
-      <div class="section payload-section">
-        <div class="section-header">
-          <span class="section-label"><span class="section-dot"></span>Payload</span>
-          <button class="btn-copy" id="copy-payload" onclick="copySection('payload')">Copy</button>
-        </div>
-        <div class="section-body"><pre id="payload-json"></pre></div>
-      </div>
-
-      <div class="section signature-section">
-        <div class="section-header">
-          <span class="section-label"><span class="section-dot"></span>Signature</span>
-          <button class="btn-copy" id="copy-sig" onclick="copySection('signature')">Copy</button>
-        </div>
-        <div class="section-body"><pre id="sig-json"></pre></div>
       </div>
     </div>
   </div>
-</section>
 
-<hr class="section-divider">
-
-<!-- ─── Features ─── -->
-<section class="features-section">
-  <div class="container">
-    <h2 class="section-heading reveal">Why jwx?</h2>
-    <p class="section-subheading reveal">A modern JWT tool built for developers who care about simplicity and privacy.</p>
-    <div class="features-grid">
-      <div class="feature-card reveal">
-        <span class="feature-icon">&#x1f3a8;</span>
-        <div class="feature-title">Beautiful Output</div>
-        <div class="feature-desc">Colorized, syntax-highlighted token display in your terminal and browser. Timestamps are annotated with human-readable relative times.</div>
-      </div>
-      <div class="feature-card reveal">
-        <span class="feature-icon">&#x26a1;</span>
-        <div class="feature-title">Zero Dependencies</div>
-        <div class="feature-desc">Single static binary. No runtime, no node_modules, no containers. Just download and run.</div>
-      </div>
-      <div class="feature-card reveal">
-        <span class="feature-icon">&#x1f512;</span>
-        <div class="feature-title">Privacy First</div>
-        <div class="feature-desc">Your tokens never leave your machine. Decoding happens entirely client-side in the browser and locally in the CLI.</div>
-      </div>
-      <div class="feature-card reveal">
-        <span class="feature-icon">&#x1f310;</span>
-        <div class="feature-title">Open Source</div>
-        <div class="feature-desc">MIT licensed and community driven. Inspect the code, contribute features, or fork it &mdash; it's yours.</div>
-      </div>
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-links">
+      <a href="https://github.com/manimovassagh/jwx">GitHub</a>
+      <a href="https://github.com/manimovassagh/jwx/releases">Releases</a>
+      <a href="https://github.com/manimovassagh/jwx/issues">Issues</a>
     </div>
-  </div>
-</section>
-
-<hr class="section-divider">
-
-<!-- ─── Install ─── -->
-<section class="install-section" id="install">
-  <div class="container">
-    <h2 class="section-heading reveal">Get Started</h2>
-    <p class="section-subheading reveal">Install jwx with a single command.</p>
-    <div class="install-card reveal">
-      <div class="install-label">Install via Go</div>
-      <div class="install-cmd">
-        <code><span class="prompt">$</span> go install github.com/manimovassagh/jwx/cmd/jwx@latest</code>
-        <button class="btn-copy" onclick="copyInstall(this)">Copy</button>
-      </div>
-      <p class="install-note">Requires Go 1.21+. Or download a prebuilt binary from <a href="https://github.com/manimovassagh/jwx/releases">Releases</a>.</p>
+    <button class="footer-install" onclick="copyInstall(this)" title="Click to copy">$ go install github.com/manimovassagh/jwx/cmd/jwx@latest</button>
+    <div style="display:flex;align-items:center;gap:.4rem">
+      <span class="privacy-dot"></span>
+      <span>Tokens never leave your browser</span>
     </div>
-  </div>
-</section>
-
-<hr class="section-divider">
-
-<!-- ─── Footer ─── -->
-<footer>
-  <div class="container">
-    <div class="footer-inner">
-      <div class="footer-left">
-        <span class="footer-brand">jwx</span>
-        <nav class="footer-links">
-          <a href="https://github.com/manimovassagh/jwx">GitHub</a>
-          <a href="https://github.com/manimovassagh/jwx/releases">Releases</a>
-          <a href="https://github.com/manimovassagh/jwx/issues">Issues</a>
-        </nav>
-      </div>
-      <div class="footer-right">
-        <span class="footer-go">Made with <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" stroke="#818cf8" stroke-width="1.5"/><text x="8" y="11" text-anchor="middle" font-size="8" fill="#818cf8" font-family="Inter,sans-serif" font-weight="700">Go</text></svg></span>
-      </div>
-    </div>
-    <p class="footer-privacy"><span class="footer-privacy-dot"></span>Your tokens never leave your browser. Everything runs client-side.</p>
-  </div>
-</footer>
+  </footer>
+</div>
 
 <script>
 var SAMPLES = {
-  basic: {label: 'Basic HS256', token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c'},
-  rich: {label: 'RS256 + Claims', token: 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImFiYzEyMyJ9.eyJpc3MiOiJodHRwczovL2F1dGguZXhhbXBsZS5jb20iLCJzdWIiOiJ1c2VyXzQyIiwiYXVkIjoiYXBpLmV4YW1wbGUuY29tIiwibmFtZSI6Ik1hbmkgTW92YXNzYWdoIiwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzEwNjAwMDAwLCJleHAiOjE5MDAwMDAwMDB9.fakesig'},
-  expired: {label: 'Expired', token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwiZXhwIjoxNTE2MjM5MDIyfQ.4lKlMEaOmgSFB2ACmiTVsEL6L-5hAeTnjIPAhCMKBFE'},
-  admin: {label: 'Admin + Roles', token: 'eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbl8xIiwicm9sZXMiOlsiYWRtaW4iLCJzdXBlcl9hZG1pbiJdLCJwZXJtaXNzaW9ucyI6WyJyZWFkIiwid3JpdGUiLCJkZWxldGUiLCJtYW5hZ2VfdXNlcnMiXSwib3JnIjoiYWNtZS1jb3JwIiwiaWF0IjoxNzEwNjAwMDAwLCJleHAiOjE5MDAwMDAwMDB9.fakesig'},
-  oauth: {label: 'OAuth2 Token', token: 'eyJhbGciOiJSUzI1NiIsInR5cCI6ImF0K2p3dCIsImtpZCI6InNpZy0xIn0.eyJpc3MiOiJodHRwczovL2lkcC5leGFtcGxlLmNvbSIsInN1YiI6InVzZXJfNDIiLCJhdWQiOiJodHRwczovL2FwaS5leGFtcGxlLmNvbSIsImNsaWVudF9pZCI6IndlYi1hcHAiLCJzY29wZSI6Im9wZW5pZCBwcm9maWxlIGVtYWlsIiwiaWF0IjoxNzEwNjAwMDAwLCJleHAiOjE5MDAwMDAwMDAsImp0aSI6ImE4ZjVmMTY3LTRiMjMtNGE5OC1iN2M2LTlkZjJlMzQ1Njc4OSJ9.fakesig'}
+  basic:{l:'Basic HS256',c:'#6366f1',t:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c'},
+  rich:{l:'RS256 + Claims',c:'#8b5cf6',t:'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImFiYzEyMyJ9.eyJpc3MiOiJodHRwczovL2F1dGguZXhhbXBsZS5jb20iLCJzdWIiOiJ1c2VyXzQyIiwiYXVkIjoiYXBpLmV4YW1wbGUuY29tIiwibmFtZSI6Ik1hbmkgTW92YXNzYWdoIiwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzEwNjAwMDAwLCJleHAiOjE5MDAwMDAwMDB9.fakesig'},
+  expired:{l:'Expired',c:'#ef4444',t:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwiZXhwIjoxNTE2MjM5MDIyfQ.4lKlMEaOmgSFB2ACmiTVsEL6L-5hAeTnjIPAhCMKBFE'},
+  admin:{l:'Admin + Roles',c:'#22c55e',t:'eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbl8xIiwicm9sZXMiOlsiYWRtaW4iLCJzdXBlcl9hZG1pbiJdLCJwZXJtaXNzaW9ucyI6WyJyZWFkIiwid3JpdGUiLCJkZWxldGUiLCJtYW5hZ2VfdXNlcnMiXSwib3JnIjoiYWNtZS1jb3JwIiwiaWF0IjoxNzEwNjAwMDAwLCJleHAiOjE5MDAwMDAwMDB9.fakesig'},
+  oauth:{l:'OAuth2',c:'#06b6d4',t:'eyJhbGciOiJSUzI1NiIsInR5cCI6ImF0K2p3dCIsImtpZCI6InNpZy0xIn0.eyJpc3MiOiJodHRwczovL2lkcC5leGFtcGxlLmNvbSIsInN1YiI6InVzZXJfNDIiLCJhdWQiOiJodHRwczovL2FwaS5leGFtcGxlLmNvbSIsImNsaWVudF9pZCI6IndlYi1hcHAiLCJzY29wZSI6Im9wZW5pZCBwcm9maWxlIGVtYWlsIiwiaWF0IjoxNzEwNjAwMDAwLCJleHAiOjE5MDAwMDAwMDAsImp0aSI6ImE4ZjVmMTY3LTRiMjMtNGE5OC1iN2M2LTlkZjJlMzQ1Njc4OSJ9.fakesig'}
 };
+var _h,_p,_s;
 
-function loadSample(key){
-  if(!key) return;
-  document.getElementById('jwt-input').value = SAMPLES[key].token;
+(function(){
+  // Build pills
+  var pc=document.getElementById('pills');
+  Object.keys(SAMPLES).forEach(function(k){
+    var s=SAMPLES[k],b=document.createElement('button');
+    b.className='pill';b.setAttribute('data-key',k);
+    var d=document.createElement('span');d.className='pill-dot';d.style.background=s.c;
+    b.appendChild(d);b.appendChild(document.createTextNode(s.l));
+    b.addEventListener('click',function(){pick(k)});
+    pc.appendChild(b);
+  });
+
+  // Auto-decode
+  var inp=document.getElementById('input');
+  inp.addEventListener('input',decode);
+  inp.addEventListener('paste',function(){setTimeout(decode,10)});
+
+  // Load default token
+  pick('rich');
+})();
+
+function pick(k){
+  document.querySelectorAll('.pill').forEach(function(p){p.classList.toggle('active',p.getAttribute('data-key')===k)});
+  document.getElementById('input').value=SAMPLES[k].t;
   decode();
 }
 
-function base64urlDecode(str){
-  str = str.replace(/-/g,'+').replace(/_/g,'/');
-  while(str.length % 4) str += '=';
-  return decodeURIComponent(atob(str).split('').map(function(c){
-    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-  }).join(''));
+function b64(s){
+  s=s.replace(/-/g,'+').replace(/_/g,'/');
+  while(s.length%4)s+='=';
+  return decodeURIComponent(atob(s).split('').map(function(c){return'%'+('00'+c.charCodeAt(0).toString(16)).slice(-2)}).join(''));
 }
 
 function decode(){
-  var raw = document.getElementById('jwt-input').value.trim();
-  var errEl = document.getElementById('error');
-  var errText = document.getElementById('error-text');
-  var decodedEl = document.getElementById('decoded');
-  var statusEl = document.getElementById('status');
+  var raw=document.getElementById('input').value.trim();
+  var out=document.getElementById('output');
+  var badges=document.getElementById('badges');
+  var empty=document.getElementById('empty');
 
-  errEl.className = 'error-msg';
-  errText.textContent = '';
-  decodedEl.className = 'decoded';
-  statusEl.textContent = '';
+  badges.textContent='';
+  if(!raw){out.innerHTML='';out.appendChild(empty);empty.style.display='';return}
+  if(empty)empty.style.display='none';
 
-  if(!raw) return;
+  if(raw.toLowerCase().indexOf('bearer ')===0)raw=raw.slice(7);
+  var parts=raw.split('.');
+  if(parts.length!==3){showErr(out,'Invalid JWT: expected 3 parts, got '+parts.length);return}
 
-  if(raw.toLowerCase().indexOf('bearer ') === 0){
-    raw = raw.slice(7);
+  var header,payload;
+  try{header=JSON.parse(b64(parts[0]))}catch(e){showErr(out,'Bad header: '+e.message);return}
+  try{payload=JSON.parse(b64(parts[1]))}catch(e){showErr(out,'Bad payload: '+e.message);return}
+
+  _h=JSON.stringify(header,null,2);_p=JSON.stringify(payload,null,2);_s=parts[2];
+
+  // Badges
+  if(header.alg){var ab=document.createElement('span');ab.className='alg-badge';ab.textContent=header.alg;badges.appendChild(ab)}
+  if(typeof payload.exp==='number'){
+    var now=Math.floor(Date.now()/1000),eb=document.createElement('span');
+    eb.className='exp-badge '+(payload.exp>now?'valid':'expired');
+    eb.textContent=payload.exp>now?'Valid':'Expired';
+    badges.appendChild(eb);
   }
 
-  var parts = raw.split('.');
-  if(parts.length !== 3){
-    showError('Invalid JWT: expected 3 dot-separated parts, got ' + parts.length);
-    return;
-  }
+  // Render sections
+  out.textContent='';
+  out.appendChild(makeSection('Header','header-s','blue',header,false));
+  out.appendChild(makeSection('Payload','payload-s','green',payload,true));
 
-  var header, payload;
-  try{ header = JSON.parse(base64urlDecode(parts[0])); }
-  catch(e){ showError('Failed to decode header: ' + e.message); return; }
-  try{ payload = JSON.parse(base64urlDecode(parts[1])); }
-  catch(e){ showError('Failed to decode payload: ' + e.message); return; }
-
-  window._jwxHeader = JSON.stringify(header, null, 2);
-  window._jwxPayload = JSON.stringify(payload, null, 2);
-  window._jwxSignature = parts[2];
-
-  /* Build status badges */
-  statusEl.textContent = '';
-  if(header.alg){
-    var algBadge = document.createElement('span');
-    algBadge.className = 'alg-badge';
-    algBadge.textContent = header.alg;
-    statusEl.appendChild(algBadge);
-  }
-  if(header.typ){
-    var typBadge = document.createElement('span');
-    typBadge.className = 'alg-badge';
-    typBadge.textContent = header.typ;
-    statusEl.appendChild(typBadge);
-  }
-  if(typeof payload.exp === 'number'){
-    var now = Math.floor(Date.now() / 1000);
-    var expiryBadge = document.createElement('span');
-    if(payload.exp > now){
-      expiryBadge.className = 'expiry-badge valid';
-      expiryBadge.textContent = 'Valid';
-    } else {
-      expiryBadge.className = 'expiry-badge expired';
-      expiryBadge.textContent = 'Expired';
-    }
-    statusEl.appendChild(expiryBadge);
-  }
-
-  renderJson(document.getElementById('header-json'), header, false);
-  renderJson(document.getElementById('payload-json'), payload, true);
-
-  var sigPre = document.getElementById('sig-json');
-  sigPre.textContent = '';
-  var sigSpan = document.createElement('span');
-  sigSpan.className = 'json-string';
-  sigSpan.textContent = parts[2];
-  sigPre.appendChild(sigSpan);
-
-  decodedEl.className = 'decoded show';
+  var sigSec=document.createElement('div');sigSec.className='section sig-s';
+  var sigTop=document.createElement('div');sigTop.className='section-top';
+  var sigName=document.createElement('span');sigName.className='section-name';
+  var sigDot=document.createElement('span');sigDot.className='sec-dot gold';
+  sigName.appendChild(sigDot);sigName.appendChild(document.createTextNode('Signature'));
+  var sigCopy=document.createElement('button');sigCopy.className='copy-btn';sigCopy.textContent='Copy';
+  sigCopy.onclick=function(){copyText(_s,sigCopy)};
+  sigTop.appendChild(sigName);sigTop.appendChild(sigCopy);
+  var sigBody=document.createElement('div');sigBody.className='section-content';
+  var sigPre=document.createElement('pre');
+  var sigSpan=document.createElement('span');sigSpan.className='json-str';sigSpan.textContent=parts[2];
+  sigPre.appendChild(sigSpan);sigBody.appendChild(sigPre);
+  sigSec.appendChild(sigTop);sigSec.appendChild(sigBody);
+  out.appendChild(sigSec);
 }
 
-function renderJson(container, obj, detectTimestamps){
-  container.textContent = '';
-  var json = JSON.stringify(obj, null, 2);
-  var lines = json.split('\n');
+function makeSection(name,cls,dotCls,obj,timestamps){
+  var sec=document.createElement('div');sec.className='section '+cls;
+  var top=document.createElement('div');top.className='section-top';
+  var nm=document.createElement('span');nm.className='section-name';
+  var dot=document.createElement('span');dot.className='sec-dot '+dotCls;
+  nm.appendChild(dot);nm.appendChild(document.createTextNode(name));
+  var cb=document.createElement('button');cb.className='copy-btn';cb.textContent='Copy';
+  var json=JSON.stringify(obj,null,2);
+  cb.onclick=function(){copyText(json,cb)};
+  top.appendChild(nm);top.appendChild(cb);
 
-  for(var i = 0; i < lines.length; i++){
-    if(i > 0) container.appendChild(document.createTextNode('\n'));
-    appendHighlightedLine(container, lines[i]);
+  var body=document.createElement('div');body.className='section-content';
+  var pre=document.createElement('pre');
+  renderJson(pre,obj,timestamps);
+  body.appendChild(pre);
+  sec.appendChild(top);sec.appendChild(body);
+  return sec;
+}
 
-    if(detectTimestamps){
-      var tsMatch = lines[i].match(/"(exp|iat|nbf|auth_time)"\s*:\s*(\d+)/);
-      if(tsMatch){
-        var tsSpan = document.createElement('span');
-        tsSpan.className = 'json-ts';
-        var icon = document.createElement('span');
-        icon.className = 'json-ts-icon';
-        icon.textContent = tsMatch[1] === 'exp' ? '\u23f3' : '\u231a';
-        tsSpan.appendChild(icon);
-        var tsText = document.createTextNode(formatTimestamp(tsMatch[1], parseInt(tsMatch[2], 10)));
-        tsSpan.appendChild(tsText);
-        container.appendChild(tsSpan);
+function renderJson(el,obj,ts){
+  var json=JSON.stringify(obj,null,2);
+  json.split('\n').forEach(function(line,i){
+    if(i>0)el.appendChild(document.createTextNode('\n'));
+    var kv=line.match(/^(\s*)"([^"]+)"\s*:\s*(.*)/);
+    if(kv){
+      el.appendChild(document.createTextNode(kv[1]));
+      var k=document.createElement('span');k.className='json-key';k.textContent='"'+kv[2]+'"';
+      el.appendChild(k);el.appendChild(document.createTextNode(': '));
+      appendVal(el,kv[3]);
+      if(ts&&/^"(exp|iat|nbf|auth_time)"/.test(line.trim())){
+        var m=line.match(/"(exp|iat|nbf|auth_time)"\s*:\s*(\d+)/);
+        if(m){var a=document.createElement('span');a.className='json-ts';a.textContent=fmtTs(m[1],+m[2]);el.appendChild(a)}
       }
-    }
-  }
-}
-
-function appendHighlightedLine(container, line){
-  var kvRegex = /^(\s*)"([^"]+)"\s*:\s*(.*)/;
-  var kvMatch = line.match(kvRegex);
-
-  if(kvMatch){
-    container.appendChild(document.createTextNode(kvMatch[1]));
-    var keySpan = document.createElement('span');
-    keySpan.className = 'json-key';
-    keySpan.textContent = '"' + kvMatch[2] + '"';
-    container.appendChild(keySpan);
-    container.appendChild(document.createTextNode(': '));
-    appendValue(container, kvMatch[3]);
-    return;
-  }
-
-  var standaloneStr = line.match(/^(\s*)"([^"]*)"(,?)$/);
-  if(standaloneStr){
-    container.appendChild(document.createTextNode(standaloneStr[1]));
-    var strSpan = document.createElement('span');
-    strSpan.className = 'json-string';
-    strSpan.textContent = '"' + standaloneStr[2] + '"';
-    container.appendChild(strSpan);
-    if(standaloneStr[3]) container.appendChild(document.createTextNode(standaloneStr[3]));
-    return;
-  }
-
-  container.appendChild(document.createTextNode(line));
-}
-
-function appendValue(container, valStr){
-  valStr = valStr.trim();
-  var trailing = '';
-  if(valStr.endsWith(',')){
-    trailing = ',';
-    valStr = valStr.slice(0, -1);
-  }
-
-  var span = document.createElement('span');
-
-  if(valStr.charAt(0) === '"' && valStr.charAt(valStr.length - 1) === '"'){
-    span.className = 'json-string';
-    span.textContent = valStr;
-  } else if(/^-?\d+\.?\d*$/.test(valStr)){
-    span.className = 'json-number';
-    span.textContent = valStr;
-  } else if(valStr === 'true' || valStr === 'false' || valStr === 'null'){
-    span.className = 'json-bool';
-    span.textContent = valStr;
-  } else {
-    span = null;
-    container.appendChild(document.createTextNode(valStr));
-  }
-
-  if(span) container.appendChild(span);
-  if(trailing) container.appendChild(document.createTextNode(trailing));
-}
-
-function showError(msg){
-  var el = document.getElementById('error');
-  var textEl = document.getElementById('error-text');
-  textEl.textContent = msg;
-  el.className = 'error-msg show';
-}
-
-function clearAll(){
-  document.getElementById('jwt-input').value = '';
-  document.getElementById('error').className = 'error-msg';
-  document.getElementById('error-text').textContent = '';
-  document.getElementById('decoded').className = 'decoded';
-  document.getElementById('status').textContent = '';
-  document.querySelectorAll('.pill').forEach(function(p){ p.classList.remove('active'); });
-}
-
-function formatTimestamp(key, ts){
-  var date = new Date(ts * 1000);
-  var dateStr = date.toISOString().replace('T', ' ').replace(/\.\d+Z$/, ' UTC');
-  var now = Math.floor(Date.now() / 1000);
-  var diff = ts - now;
-  var rel = '';
-
-  if(key === 'exp'){
-    if(diff > 0) rel = '  \u2713 Expires ' + relativeTime(diff);
-    else rel = '  \u26a0 EXPIRED ' + relativeTime(-diff) + ' ago';
-  } else if(key === 'nbf'){
-    if(diff > 0) rel = '  \u26a0 Not valid for another ' + relativeTime(diff);
-    else rel = '  \u2713 Active since ' + relativeTime(-diff) + ' ago';
-  } else if(key === 'iat' || key === 'auth_time'){
-    if(diff <= 0) rel = '  Issued ' + relativeTime(-diff) + ' ago';
-    else rel = '  in ' + relativeTime(diff);
-  }
-  return dateStr + rel;
-}
-
-function relativeTime(sec){
-  if(sec < 60) return sec + 's';
-  var min = Math.floor(sec / 60);
-  if(min < 60) return min + ' minute' + (min === 1 ? '' : 's');
-  var hrs = Math.floor(min / 60);
-  if(hrs < 24) return hrs + ' hour' + (hrs === 1 ? '' : 's');
-  var days = Math.floor(hrs / 24);
-  if(days < 30) return days + ' day' + (days === 1 ? '' : 's');
-  if(days < 365){
-    var months = Math.floor(days / 30);
-    return months + ' month' + (months === 1 ? '' : 's');
-  }
-  var years = Math.floor(days / 365);
-  return years + ' year' + (years === 1 ? '' : 's');
-}
-
-function copySection(which){
-  var text;
-  var btnId;
-  if(which === 'header'){ text = window._jwxHeader; btnId = 'copy-header'; }
-  else if(which === 'payload'){ text = window._jwxPayload; btnId = 'copy-payload'; }
-  else if(which === 'signature'){ text = window._jwxSignature; btnId = 'copy-sig'; }
-  if(!text) return;
-
-  var btn = document.getElementById(btnId);
-  navigator.clipboard.writeText(text).then(function(){
-    if(btn){
-      btn.textContent = 'Copied!';
-      btn.classList.add('copied');
-      setTimeout(function(){
-        btn.textContent = 'Copy';
-        btn.classList.remove('copied');
-      }, 1500);
+    } else {
+      var sv=line.match(/^(\s*)"([^"]*)"(,?)$/);
+      if(sv){el.appendChild(document.createTextNode(sv[1]));var s=document.createElement('span');s.className='json-str';s.textContent='"'+sv[2]+'"';el.appendChild(s);if(sv[3])el.appendChild(document.createTextNode(sv[3]))}
+      else el.appendChild(document.createTextNode(line));
     }
   });
 }
 
+function appendVal(el,v){
+  v=v.trim();var trail='';if(v.endsWith(',')){trail=',';v=v.slice(0,-1)}
+  var sp=document.createElement('span');
+  if(v[0]==='"'&&v[v.length-1]==='"'){sp.className='json-str';sp.textContent=v}
+  else if(/^-?\d+\.?\d*$/.test(v)){sp.className='json-num';sp.textContent=v}
+  else if(v==='true'||v==='false'||v==='null'){sp.className='json-bool';sp.textContent=v}
+  else{sp=null;el.appendChild(document.createTextNode(v))}
+  if(sp)el.appendChild(sp);
+  if(trail)el.appendChild(document.createTextNode(trail));
+}
+
+function showErr(out,msg){
+  out.textContent='';
+  var e=document.createElement('div');e.className='error-state';e.textContent=msg;
+  out.appendChild(e);
+}
+
+function fmtTs(key,ts){
+  var d=new Date(ts*1000),ds=d.toISOString().replace('T',' ').replace(/\.\d+Z$/,' UTC');
+  var now=Math.floor(Date.now()/1000),diff=ts-now,r='';
+  if(key==='exp'){r=diff>0?' ✓ Expires '+rel(diff):' ⚠ EXPIRED '+rel(-diff)+' ago'}
+  else if(key==='iat'||key==='auth_time'){r=diff<=0?' '+rel(-diff)+' ago':''}
+  else if(key==='nbf'){r=diff>0?' ⚠ Not valid for '+rel(diff):' ✓ Active'}
+  return ds+r;
+}
+function rel(s){
+  if(s<60)return s+'s';var m=Math.floor(s/60);if(m<60)return m+' min';
+  var h=Math.floor(m/60);if(h<24)return h+' hr';var d=Math.floor(h/24);
+  if(d<30)return d+' day'+(d>1?'s':'');if(d<365){var mo=Math.floor(d/30);return mo+' month'+(mo>1?'s':'')}
+  var y=Math.floor(d/365);return y+' year'+(y>1?'s':'');
+}
+
+function copyText(t,btn){
+  navigator.clipboard.writeText(t).then(function(){
+    btn.textContent='Copied!';btn.classList.add('done');
+    setTimeout(function(){btn.textContent='Copy';btn.classList.remove('done')},1200);
+  });
+}
 function copyInstall(btn){
-  var cmd = 'go install github.com/manimovassagh/jwx/cmd/jwx@latest';
-  navigator.clipboard.writeText(cmd).then(function(){
-    btn.textContent = 'Copied!';
-    btn.classList.add('copied');
-    setTimeout(function(){
-      btn.textContent = 'Copy';
-      btn.classList.remove('copied');
-    }, 1500);
+  navigator.clipboard.writeText('go install github.com/manimovassagh/jwx/cmd/jwx@latest').then(function(){
+    var orig=btn.textContent;btn.textContent='Copied!';
+    setTimeout(function(){btn.textContent=orig},1200);
   });
 }
-
-/* ─── Init ─── */
-(function(){
-  /* Floating dots */
-  var dotsContainer = document.getElementById('dots');
-  for(var i = 0; i < 30; i++){
-    var dot = document.createElement('div');
-    dot.className = 'dot';
-    dot.style.left = Math.random() * 100 + '%';
-    dot.style.top = (80 + Math.random() * 40) + '%';
-    dot.style.animationDuration = (8 + Math.random() * 12) + 's';
-    dot.style.animationDelay = Math.random() * 10 + 's';
-    dot.style.width = (1 + Math.random() * 2) + 'px';
-    dot.style.height = dot.style.width;
-    dotsContainer.appendChild(dot);
-  }
-
-  /* Intersection Observer for reveal animations */
-  var reveals = document.querySelectorAll('.reveal');
-  if('IntersectionObserver' in window){
-    var observer = new IntersectionObserver(function(entries){
-      entries.forEach(function(entry){
-        if(entry.isIntersecting){
-          entry.target.classList.add('visible');
-          observer.unobserve(entry.target);
-        }
-      });
-    },{threshold:0.1,rootMargin:'0px 0px -40px 0px'});
-    reveals.forEach(function(el){ observer.observe(el); });
-  } else {
-    reveals.forEach(function(el){ el.classList.add('visible'); });
-  }
-
-  /* Feature card mouse tracking for radial glow */
-  document.querySelectorAll('.feature-card').forEach(function(card){
-    card.addEventListener('mousemove', function(e){
-      var rect = card.getBoundingClientRect();
-      card.style.setProperty('--mouse-x', (e.clientX - rect.left) + 'px');
-      card.style.setProperty('--mouse-y', (e.clientY - rect.top) + 'px');
-    });
-  });
-
-  /* Auto-decode on input */
-  var input = document.getElementById('jwt-input');
-  input.addEventListener('input', function(){ decode(); });
-  input.addEventListener('paste', function(){ setTimeout(decode, 10); });
-
-  /* Build sample pills dynamically */
-  var pillContainer = document.getElementById('sample-pills');
-  var sampleKeys = ['basic','rich','expired','admin','oauth'];
-  var dotColors = ['blue','purple','red','green','cyan'];
-  sampleKeys.forEach(function(key, idx){
-    var btn = document.createElement('button');
-    btn.className = 'pill';
-    btn.setAttribute('data-sample', key);
-
-    var dotEl = document.createElement('span');
-    dotEl.className = 'pill-dot ' + dotColors[idx];
-    btn.appendChild(dotEl);
-
-    var label = document.createTextNode(SAMPLES[key].label);
-    btn.appendChild(label);
-
-    btn.addEventListener('click', function(){
-      document.querySelectorAll('.pill').forEach(function(p){ p.classList.remove('active'); });
-      btn.classList.add('active');
-      loadSample(key);
-    });
-    pillContainer.appendChild(btn);
-  });
-})();
 </script>
-
 </body>
 </html>

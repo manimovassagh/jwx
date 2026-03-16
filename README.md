@@ -127,16 +127,6 @@ jwx completion powershell | Out-String | Invoke-Expression # PowerShell
 
 Contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
-## Star History
-
-<a href="https://star-history.com/#manimovassagh/jwx&Date">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=manimovassagh/jwx&type=Date&theme=dark" />
-    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=manimovassagh/jwx&type=Date" />
-    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=manimovassagh/jwx&type=Date" width="600" />
-  </picture>
-</a>
-
 ## License
 
 [MIT](LICENSE)

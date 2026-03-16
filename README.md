@@ -6,15 +6,12 @@
     <a href="https://goreportcard.com/report/github.com/manimovassagh/jwx"><img src="https://goreportcard.com/badge/github.com/manimovassagh/jwx" alt="Go Report Card"></a>
     <a href="https://github.com/manimovassagh/jwx/releases"><img src="https://img.shields.io/github/v/release/manimovassagh/jwx?include_prereleases" alt="Release"></a>
     <a href="LICENSE"><img src="https://img.shields.io/github/license/manimovassagh/jwx" alt="License"></a>
+    <a href="https://manimovassagh.github.io/jwx/"><img src="https://img.shields.io/badge/try_in_browser-blue?style=for-the-badge" alt="Try in browser"></a>
   </p>
 </p>
 
 <p align="center">
   <img src="docs/assets/jwx-demo.gif" alt="jwx demo" width="800">
-</p>
-
-<p align="center">
-  <a href="https://manimovassagh.github.io/jwx/"><img src="https://img.shields.io/badge/%F0%9F%8C%90%20Try%20it%20in%20your%20browser-blue?style=for-the-badge" alt="Try it in your browser"></a>
 </p>
 
 ## Why jwx?
@@ -23,6 +20,8 @@
 - **Beautiful output** -- colorized rounded boxes with human-readable timestamps, not a raw JSON dump.
 - **Privacy first** -- tokens are decoded locally on your machine. Nothing is ever sent to a server.
 - **Pipe-friendly** -- reads from stdin, supports `--json` for scripting with `jq`.
+
+> **Unlike jwt.io**, your tokens never leave your machine. No tracking, no accounts, 100% local.
 
 ## Install
 
@@ -39,9 +38,15 @@ curl -sL https://github.com/manimovassagh/jwx/releases/latest/download/jwx_linux
 sudo mv jwx /usr/local/bin/
 ```
 
-### :window: Windows
+### Windows
 
-Download `.exe` from [Releases](https://github.com/manimovassagh/jwx/releases/latest) and add to your `PATH`.
+```powershell
+Invoke-WebRequest -Uri "https://github.com/manimovassagh/jwx/releases/latest/download/jwx_windows_amd64.zip" -OutFile "$env:TEMP\jwx.zip"
+Expand-Archive "$env:TEMP\jwx.zip" -DestinationPath "$env:LOCALAPPDATA\jwx" -Force
+$env:PATH += ";$env:LOCALAPPDATA\jwx"
+```
+
+Or download `.exe` from [Releases](https://github.com/manimovassagh/jwx/releases/latest) and add to your `PATH`.
 
 ### :wrench: From Source
 
@@ -83,7 +88,6 @@ jwx --json eyJhbGci... | jq .payload.sub
 | **JSON Mode** | `--json` flag for piping to `jq` and scripts |
 | **Stdin** | Pipe tokens via stdin (`pbpaste \| jwx`) |
 | **No Color** | Respects `NO_COLOR` env var and `--no-color` flag |
-| **Exit Codes** | Scriptable: 0=ok, 1=invalid, 2=expired |
 
 ## Supported Algorithms
 
@@ -117,7 +121,7 @@ jwx completion powershell | Out-String | Invoke-Expression # PowerShell
 
 - [x] `jwx decode` -- beautiful token decoding
 - [x] `jwx sign` -- create and sign tokens
-- [ ] Clipboard support (`jwx --clipboard`)
+- [x] Clipboard support (`jwx --clipboard`)
 - [ ] `jwx verify` -- verify token signatures (JWKS support)
 - [ ] `jwx inspect` -- deep token analysis
 - [ ] `jwx audit` -- security vulnerability checks
@@ -125,7 +129,7 @@ jwx completion powershell | Out-String | Invoke-Expression # PowerShell
 
 ## Contributing
 
-Contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+Contributions are welcome! The [Roadmap](#roadmap) above lists planned features — pick one and open a PR. See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ## License
 

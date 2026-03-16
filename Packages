@@ -1,0 +1,31 @@
+Package: jwx
+Version: 1.3.0
+Architecture: arm64
+Maintainer: Mani Movassagh <mani@jwx.dev>
+Installed-Size: 4224
+Filename: ./jwx_1.3.0_linux_arm64.deb
+Size: 1716858
+MD5sum: 465ca4e7f3170ac179c1f9f4059d37e7
+SHA1: 8e9923847395bdf2f83c82498c2726f832f10918
+SHA256: 97b6a54844028cfd0085925eaf9b59c2655887d712cd5146dea97f60ad78cbab
+Priority: optional
+Homepage: https://github.com/manimovassagh/jwx
+Description: A beautiful CLI for working with JSON Web Tokens
+License: MIT
+
+Package: jwx
+Version: 1.3.0
+Architecture: amd64
+Maintainer: Mani Movassagh <mani@jwx.dev>
+Installed-Size: 4328
+Filename: ./jwx_1.3.0_linux_amd64.deb
+Size: 1860248
+MD5sum: 27eafb50498ba68cd68baceea27989b9
+SHA1: 6ce0f863e2fcd4b5a2ef3f36f574162a664e51ad
+SHA256: 15837fed23d40069df11eb3059f8e7c979ee386540674915a9e1d38542a8fd48
+Priority: optional
+Homepage: https://github.com/manimovassagh/jwx
+Description: A beautiful CLI for working with JSON Web Tokens
+Architecture-Variant: amd64v1
+License: MIT
+

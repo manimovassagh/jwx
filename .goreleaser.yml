@@ -42,7 +42,7 @@ brews:
     homepage: "https://github.com/manimovassagh/jwx"
     description: "A beautiful CLI for working with JSON Web Tokens"
     license: "MIT"
-    skip_upload: true
+    skip_upload: false
     install: |
       bin.install "jwx"
     test: |

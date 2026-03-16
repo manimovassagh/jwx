@@ -81,12 +81,12 @@ jwx --json eyJhbGci... | jq .payload.sub
 
 | Feature | Description |
 |---------|-------------|
-| **Decode** | Beautiful colorized output with rounded boxes |
-| **Sign** | Create tokens with HMAC, RSA, ECDSA, EdDSA |
-| **Timestamps** | Auto-converts to human-readable + relative time |
-| **Expiry Detection** | `EXPIRED 2 hours ago` / `Expires in 3 days` |
-| **JSON Mode** | `--json` flag for piping to `jq` and scripts |
-| **Stdin** | Pipe tokens via stdin (`pbpaste \| jwx`) |
+| **Decode** | Displays beautiful colorized output with rounded boxes |
+| **Sign** | Creates tokens with HMAC, RSA, ECDSA, EdDSA |
+| **Timestamps** | Converts timestamps to human-readable + relative time |
+| **Expiry Detection** | Detects expiry: `EXPIRED 2 hours ago` / `Expires in 3 days` |
+| **JSON Mode** | Outputs JSON with `--json` for piping to `jq` and scripts |
+| **Stdin** | Reads tokens from stdin (`pbpaste \| jwx`) |
 | **No Color** | Respects `NO_COLOR` env var and `--no-color` flag |
 
 ## Supported Algorithms

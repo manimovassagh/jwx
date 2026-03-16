@@ -15,7 +15,7 @@ fmt:
 	gofmt -w .
 
 lint:
-	golangci-lint run
+	golangci-lint run --timeout 2m
 
 check: fmt lint test
 

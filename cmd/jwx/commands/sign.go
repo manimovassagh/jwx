@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 
@@ -14,6 +15,7 @@ var (
 	signSecret string
 	signKey    string
 	signFrom   string
+	signJSON   bool
 )
 
 var signCmd = &cobra.Command{
@@ -38,6 +40,7 @@ func init() {
 	signCmd.Flags().StringVar(&signSecret, "secret", "", "Secret key for HMAC algorithms")
 	signCmd.Flags().StringVar(&signKey, "key", "", "Path to private key file (PEM) for RSA/EC/EdDSA")
 	signCmd.Flags().StringVar(&signFrom, "from", "", "Read claims from a JSON file instead of argument")
+	signCmd.Flags().BoolVarP(&signJSON, "json", "j", false, "Output as JSON ({\"token\":\"...\"})")
 	_ = signCmd.MarkFlagRequired("alg")
 }
 
@@ -67,6 +70,14 @@ func runSign(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	fmt.Println(token)
+	if signJSON {
+		out, err := json.Marshal(map[string]string{"token": token})
+		if err != nil {
+			return fmt.Errorf("failed to marshal JSON: %w", err)
+		}
+		fmt.Println(string(out))
+	} else {
+		fmt.Println(token)
+	}
 	return nil
 }

@@ -12,6 +12,10 @@ import (
 	"github.com/manimovassagh/jwx/internal/jwt"
 )
 
+// signaturePreviewLen is the maximum number of characters shown for the
+// signature preview before truncation with "...".
+const signaturePreviewLen = 32
+
 // NoColor disables color output when set to true. This is set by the
 // --no-color flag or the NO_COLOR environment variable.
 var NoColor bool
@@ -176,8 +180,8 @@ func renderSignature(token *jwt.DecodedToken) string {
 	}
 
 	sigPreview := token.Signature
-	if len(sigPreview) > 32 {
-		sigPreview = sigPreview[:32] + "..."
+	if len(sigPreview) > signaturePreviewLen {
+		sigPreview = sigPreview[:signaturePreviewLen] + "..."
 	}
 
 	lines := []string{

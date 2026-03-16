@@ -14,6 +14,8 @@
 <meta name="twitter:description" content="Decode and inspect JSON Web Tokens instantly in your browser. Free, open-source, privacy-first JWT decoder with beautiful syntax highlighting. No data leaves your machine.">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://manimovassagh.github.io/jwx/">
+<link rel="dns-prefetch" href="https://img.shields.io">
+<link rel="sitemap" type="application/xml" href="/jwx/sitemap.xml">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#x1f511;</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -309,7 +311,7 @@ pre{font-family:var(--mono);font-size:.85rem;line-height:1.65;white-space:pre-wr
 .footer a:hover{color:var(--text);text-decoration:none}
 .footer-links{display:flex;gap:1rem}
 .footer-install{
-  font-family:var(--mono);font-size:.68rem;color:#52525b;
+  font-family:var(--mono);font-size:.68rem;color:var(--muted);
   background:var(--bg);padding:.25rem .6rem;border-radius:6px;border:1px solid var(--border);
   cursor:pointer;
 }
@@ -349,8 +351,8 @@ pre{font-family:var(--mono);font-size:.85rem;line-height:1.65;white-space:pre-wr
     </div>
     <div class="header-right">
       <div class="badge-row">
-        <a href="https://github.com/manimovassagh/jwx/actions/workflows/ci.yml"><img src="https://github.com/manimovassagh/jwx/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
-        <a href="https://github.com/manimovassagh/jwx/releases"><img src="https://img.shields.io/github/v/release/manimovassagh/jwx?style=flat-square&color=6d5dfc" alt="Release"></a>
+        <a href="https://github.com/manimovassagh/jwx/actions/workflows/ci.yml"><img src="https://github.com/manimovassagh/jwx/actions/workflows/ci.yml/badge.svg" alt="CI build status"></a>
+        <a href="https://github.com/manimovassagh/jwx/releases"><img src="https://img.shields.io/github/v/release/manimovassagh/jwx?style=flat-square&color=6d5dfc" alt="Latest release version"></a>
       </div>
       <button class="theme-toggle" title="Toggle theme" id="theme-btn" aria-label="Toggle dark and light theme">☀️</button>
       <span class="privacy-dot" title="Client-side only" role="img" aria-label="Client-side only"></span>
@@ -364,7 +366,7 @@ pre{font-family:var(--mono);font-size:.85rem;line-height:1.65;white-space:pre-wr
     <!-- LEFT: Encoded JWT (dark) -->
     <div class="panel-left">
       <label for="input" class="panel-label"><span>Encoded</span> — paste or pick a sample</label>
-      <textarea class="encoded-area" id="input" spellcheck="false" autocomplete="off" placeholder="Paste a JWT here..." aria-label="Encoded JWT input"></textarea>
+      <textarea class="encoded-area" id="input" spellcheck="false" autocomplete="off" placeholder="Paste your encoded JWT here..." aria-label="Encoded JWT input"></textarea>
       <div class="pill-row" id="pills"></div>
     </div>
 
@@ -377,7 +379,7 @@ pre{font-family:var(--mono);font-size:.85rem;line-height:1.65;white-space:pre-wr
       <div class="decoded-body" id="output" aria-live="polite" aria-label="Decoded JWT output">
         <div class="empty-state" id="empty">
           <div class="empty-icon">🔑</div>
-          <div class="empty-text">Paste a JWT on the left<br>or pick a sample below</div>
+          <div class="empty-text">Paste a JWT on the left panel —<br>or click a sample token below to try it out</div>
         </div>
       </div>
     </div>
@@ -393,7 +395,7 @@ pre{font-family:var(--mono);font-size:.85rem;line-height:1.65;white-space:pre-wr
     <button class="footer-install" id="install-btn" title="Click to copy">$ go install github.com/manimovassagh/jwx/cmd/jwx@latest</button>
     <div class="footer-privacy">
       <span class="privacy-dot"></span>
-      <span>⚠️ Warning: JWTs are credentials — do not paste tokens containing real secrets or production data. This tool runs client-side only, but treat tokens with care.</span>
+      <span>Tokens are decoded locally — never sent to any server. Avoid pasting production credentials.</span>
     </div>
   </footer>
 </div>

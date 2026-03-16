@@ -14,7 +14,8 @@ What does this PR do? Include relevant context or motivation.
 ## Checklist
 
 - [ ] Tests added or updated
-- [ ] `go test ./...` passes
-- [ ] `golangci-lint run` passes
-- [ ] Test coverage >= 80%
+- [ ] Tests pass (`go test ./...`)
+- [ ] Lint passes (`golangci-lint run`)
+- [ ] Coverage >= 80%
+- [ ] No inline styles in HTML
 - [ ] Documentation updated (if applicable)

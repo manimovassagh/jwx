@@ -88,6 +88,9 @@ func TestRenderJSON_ExpiredTokenSetsIsExpired(t *testing.T) {
 	if !result.IsExpired {
 		t.Error("RenderJSON should set is_expired=true for an expired token")
 	}
+	if result.ExpiresAt == nil {
+		t.Error("expected expires_at to be set for token with ExpiresAt")
+	}
 }
 
 func TestRenderJSON_NotExpiredToken(t *testing.T) {
@@ -116,6 +119,9 @@ func TestRenderJSON_NotExpiredToken(t *testing.T) {
 
 	if result.IsExpired {
 		t.Error("RenderJSON should set is_expired=false for a valid token")
+	}
+	if result.ExpiresAt == nil {
+		t.Error("expected expires_at to be set for token with ExpiresAt")
 	}
 }
 
@@ -179,6 +185,73 @@ func TestRenderJSON_Roundtrip(t *testing.T) {
 	// Check is_expired
 	if !result.IsExpired {
 		t.Error("is_expired should be true")
+	}
+}
+
+func TestRenderJSON_TimestampFields(t *testing.T) {
+	exp := time.Date(2025, 1, 15, 12, 0, 0, 0, time.UTC)
+	iat := time.Date(2025, 1, 15, 11, 0, 0, 0, time.UTC)
+	token := &jwt.DecodedToken{
+		Header: map[string]interface{}{
+			"alg": "HS256",
+		},
+		Payload: map[string]interface{}{
+			"exp": float64(exp.Unix()),
+			"iat": float64(iat.Unix()),
+		},
+		Signature: "sig",
+		IsExpired: true,
+		ExpiresAt: &exp,
+		IssuedAt:  &iat,
+	}
+
+	output, err := RenderJSON(token)
+	if err != nil {
+		t.Fatalf("RenderJSON returned error: %v", err)
+	}
+
+	var result JSONOutput
+	if err := json.Unmarshal([]byte(output), &result); err != nil {
+		t.Fatalf("failed to unmarshal output: %v", err)
+	}
+
+	if result.ExpiresAt == nil {
+		t.Fatal("expected expires_at to be set")
+	}
+	if *result.ExpiresAt != "2025-01-15T12:00:00Z" {
+		t.Errorf("expected expires_at=%q, got %q", "2025-01-15T12:00:00Z", *result.ExpiresAt)
+	}
+
+	if result.IssuedAt == nil {
+		t.Fatal("expected issued_at to be set")
+	}
+	if *result.IssuedAt != "2025-01-15T11:00:00Z" {
+		t.Errorf("expected issued_at=%q, got %q", "2025-01-15T11:00:00Z", *result.IssuedAt)
+	}
+}
+
+func TestRenderJSON_NoTimestamps(t *testing.T) {
+	token := &jwt.DecodedToken{
+		Header:    map[string]interface{}{"alg": "HS256"},
+		Payload:   map[string]interface{}{"sub": "test"},
+		Signature: "sig",
+	}
+
+	output, err := RenderJSON(token)
+	if err != nil {
+		t.Fatalf("RenderJSON returned error: %v", err)
+	}
+
+	var result JSONOutput
+	if err := json.Unmarshal([]byte(output), &result); err != nil {
+		t.Fatalf("failed to unmarshal output: %v", err)
+	}
+
+	if result.ExpiresAt != nil {
+		t.Error("expected expires_at to be nil when not set")
+	}
+	if result.IssuedAt != nil {
+		t.Error("expected issued_at to be nil when not set")
 	}
 }
 

@@ -2,6 +2,12 @@ version: 2
 
 project_name: jwx
 
+env:
+  - GO111MODULE=on
+
+gomod:
+  proxy: true
+
 builds:
   - main: ./cmd/jwx
     binary: jwx

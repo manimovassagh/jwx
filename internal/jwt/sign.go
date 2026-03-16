@@ -142,6 +142,8 @@ func signRSA(alg, keyFile, input string) ([]byte, error) {
 	case "RS512":
 		hashFunc = sha512.New
 		cryptoHash = crypto.SHA512
+	default:
+		return nil, fmt.Errorf("unsupported RSA algorithm: %s", alg)
 	}
 
 	hasher := hashFunc()

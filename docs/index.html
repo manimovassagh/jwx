@@ -12,6 +12,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="jwx — Privacy-first JWT Decoder">
 <meta name="twitter:description" content="Decode and inspect JSON Web Tokens instantly in your browser. Free, open-source, privacy-first JWT decoder with beautiful syntax highlighting. No data leaves your machine.">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src * data:; script-src 'self' 'unsafe-inline'; connect-src 'self'">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://manimovassagh.github.io/jwx/">
 <link rel="dns-prefetch" href="https://img.shields.io">
@@ -129,6 +130,8 @@
     --ts-bg:rgba(55,48,163,.06);
   }
 }
+.skip-link{position:absolute;top:-100%;left:0;background:var(--accent);color:#fff;padding:.5rem 1rem;z-index:100;border-radius:0 0 8px 0;font-size:.85rem;text-decoration:none;transition:top .2s}
+.skip-link:focus{top:0}
 html{font-size:16px}
 body{background:var(--bg);color:var(--text);font-family:var(--font);overflow:hidden;height:100vh;width:100vw}
 
@@ -341,6 +344,7 @@ pre{font-family:var(--mono);font-size:.85rem;line-height:1.65;white-space:pre-wr
 </script>
 </head>
 <body>
+<a href="#input" class="skip-link">Skip to decoder</a>
 <div class="app">
 
   <!-- HEADER -->
@@ -367,7 +371,7 @@ pre{font-family:var(--mono);font-size:.85rem;line-height:1.65;white-space:pre-wr
     <div class="panel-left">
       <label for="input" class="panel-label"><span>Encoded</span> — paste or pick a sample</label>
       <textarea class="encoded-area" id="input" spellcheck="false" autocomplete="off" placeholder="Paste your encoded JWT here..." aria-label="Encoded JWT input"></textarea>
-      <div class="pill-row" id="pills"></div>
+      <div class="pill-row" id="pills" role="radiogroup" aria-label="Sample JWT tokens"></div>
     </div>
 
     <!-- RIGHT: Decoded (light) -->
@@ -430,6 +434,7 @@ function getOsTheme(){
   Object.keys(SAMPLES).forEach(function(k){
     var s=SAMPLES[k],b=document.createElement('button');
     b.className='pill';b.setAttribute('data-key',k);
+    b.setAttribute('role','radio');b.setAttribute('aria-checked','false');b.setAttribute('tabindex','0');
     var d=document.createElement('span');d.className='pill-dot';d.style.background=s.c;
     b.appendChild(d);b.appendChild(document.createTextNode(s.l));
     b.addEventListener('click',function(){pick(k)});
@@ -474,7 +479,7 @@ function getOsTheme(){
 })();
 
 function pick(k){
-  document.querySelectorAll('.pill').forEach(function(p){p.classList.toggle('active',p.getAttribute('data-key')===k)});
+  document.querySelectorAll('.pill').forEach(function(p){var sel=p.getAttribute('data-key')===k;p.classList.toggle('active',sel);p.setAttribute('aria-checked',sel?'true':'false')});
   document.getElementById('input').value=SAMPLES[k].t;
   decode();
 }
@@ -514,8 +519,8 @@ function decode(){
 
   _h=JSON.stringify(header,null,2);_p=JSON.stringify(payload,null,2);_s=parts[2];
 
-  // Update URL hash — URL-encode the token (Issues #5, #39, #61, #71, #88, #101, #110)
-  try{history.replaceState(null,'','#'+encodeURIComponent(raw))}catch(e){}
+  // Update URL hash — URL-encode the token, cap at 2000 chars (Issues #5, #39, #61, #71, #88, #101, #110)
+  if(raw.length < 2000) { try{history.replaceState(null,'','#'+encodeURIComponent(raw))}catch(e){} }
 
   // Badges
   if(header.alg){var ab=document.createElement('span');ab.className='alg-badge';ab.textContent=header.alg;badges.appendChild(ab)}

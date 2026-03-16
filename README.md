@@ -21,7 +21,7 @@
 - **Privacy first** -- tokens are decoded locally on your machine. Nothing is ever sent to a server.
 - **Pipe-friendly** -- reads from stdin, supports `--json` for scripting with `jq`.
 
-> **Unlike jwt.io**, your tokens never leave your machine. No tracking, no accounts, 100% local.
+> **Unlike browser-based decoders**, your tokens never leave your machine. No tracking, no accounts, 100% local.
 
 ## Install
 
@@ -124,6 +124,14 @@ jwx completion powershell | Out-String | Invoke-Expression # PowerShell
 - [ ] `jwx inspect` -- deep token analysis
 - [ ] `jwx audit` -- security vulnerability checks
 - [ ] `jwx keygen` -- generate key pairs
+
+## Troubleshooting
+
+**`jwx: command not found`** — Make sure `$GOPATH/bin` is in your PATH: `export PATH=$PATH:$(go env GOPATH)/bin`
+
+**Token shows as "invalid"** — Ensure you're pasting the full token (3 dot-separated parts starting with `eyJ`).
+
+**No color output** — Check if `NO_COLOR` env var is set, or try `jwx decode <token>` without `--no-color`.
 
 ## Contributing
 

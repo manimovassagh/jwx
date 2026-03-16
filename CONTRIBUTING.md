@@ -2,6 +2,14 @@
 
 Thank you for your interest in contributing to **jwx**. This guide covers everything you need to get started.
 
+## Prerequisites
+
+Before you begin, make sure you have the following installed:
+
+- **Go 1.23+** — verify with `go version`
+- **golangci-lint** — install via `brew install golangci-lint` (macOS) or `go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest`
+- **git** — verify with `git --version`
+
 ## Development Setup
 
 ```bash

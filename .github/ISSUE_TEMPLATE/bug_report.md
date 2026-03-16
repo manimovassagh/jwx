@@ -24,6 +24,6 @@ What actually happened. Include error messages or stack traces if applicable.
 
 ## Environment
 
-- **jwx version**:
-- **Go version**:
-- **OS**:
+- **jwx version**: (run `jwx version`)
+- **Go version**: (run `go version`)
+- **OS**: (e.g., macOS 15.3, Ubuntu 24.04, Windows 11)

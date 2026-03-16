@@ -2,6 +2,7 @@ package jwt
 
 import (
 	"crypto/ecdsa"
+	"crypto/ed25519"
 	"crypto/elliptic"
 	"crypto/rand"
 	"crypto/rsa"
@@ -334,6 +335,47 @@ func TestSign_ES256_EndToEnd(t *testing.T) {
 	}
 	if decoded.Payload["sub"] != "ec-test" {
 		t.Errorf("expected sub=ec-test, got %v", decoded.Payload["sub"])
+	}
+}
+
+func TestSign_EdDSA_EndToEnd(t *testing.T) {
+	_, priv, err := ed25519.GenerateKey(rand.Reader)
+	if err != nil {
+		t.Fatalf("failed to generate Ed25519 key: %v", err)
+	}
+	der, err := x509.MarshalPKCS8PrivateKey(priv)
+	if err != nil {
+		t.Fatalf("failed to marshal Ed25519 key: %v", err)
+	}
+	pemData := pem.EncodeToMemory(&pem.Block{Type: "PRIVATE KEY", Bytes: der})
+	keyPath := writeKeyToTempFile(t, pemData)
+
+	token, err := Sign(SignOptions{
+		Algorithm: "EdDSA",
+		KeyFile:   keyPath,
+		Claims:    `{"sub":"eddsa-test","iss":"jwx"}`,
+	})
+	if err != nil {
+		t.Fatalf("Sign(EdDSA) unexpected error: %v", err)
+	}
+
+	parts := strings.Split(token, ".")
+	if len(parts) != 3 {
+		t.Fatalf("expected 3-part token, got %d parts", len(parts))
+	}
+
+	decoded, err := Decode(token)
+	if err != nil {
+		t.Fatalf("Decode() unexpected error: %v", err)
+	}
+	if decoded.Header["alg"] != "EDDSA" {
+		t.Errorf("expected alg=EDDSA, got %v", decoded.Header["alg"])
+	}
+	if decoded.Payload["sub"] != "eddsa-test" {
+		t.Errorf("expected sub=eddsa-test, got %v", decoded.Payload["sub"])
+	}
+	if decoded.Payload["iss"] != "jwx" {
+		t.Errorf("expected iss=jwx, got %v", decoded.Payload["iss"])
 	}
 }
 

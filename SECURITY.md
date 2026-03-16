@@ -41,3 +41,7 @@ Out of scope:
 
 - JWTs are not encrypted — payload visibility is by design
 - Denial of service via large tokens (known limitation)
+
+## Automated Scanning
+
+This project runs [`govulncheck`](https://pkg.go.dev/golang.org/x/vuln/cmd/govulncheck) in CI to detect known vulnerabilities in Go dependencies. If a vulnerability is found, the CI pipeline will flag it for review.

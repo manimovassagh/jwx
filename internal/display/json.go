@@ -2,6 +2,7 @@ package display
 
 import (
 	"encoding/json"
+	"time"
 
 	"github.com/manimovassagh/jwx/internal/jwt"
 )
@@ -12,6 +13,8 @@ type JSONOutput struct {
 	Payload   map[string]interface{} `json:"payload"`
 	Signature string                 `json:"signature"`
 	IsExpired bool                   `json:"is_expired"`
+	ExpiresAt *string                `json:"expires_at,omitempty"`
+	IssuedAt  *string                `json:"issued_at,omitempty"`
 }
 
 // RenderJSON returns the token as formatted JSON for piping.
@@ -21,6 +24,15 @@ func RenderJSON(token *jwt.DecodedToken) (string, error) {
 		Payload:   token.Payload,
 		Signature: token.Signature,
 		IsExpired: token.IsExpired,
+	}
+
+	if token.ExpiresAt != nil {
+		s := token.ExpiresAt.Format(time.RFC3339)
+		out.ExpiresAt = &s
+	}
+	if token.IssuedAt != nil {
+		s := token.IssuedAt.Format(time.RFC3339)
+		out.IssuedAt = &s
 	}
 
 	data, err := json.MarshalIndent(out, "", "  ")

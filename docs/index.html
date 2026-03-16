@@ -587,6 +587,11 @@ var CLAIM_TIPS={
   client_id:'OAuth client ID that requested this token'
 };
 
+/* ─── JWT Security Linter vars (must be before IIFE) ─── */
+var SAMPLE_TOKENS={};
+Object.keys(SAMPLES).forEach(function(k){SAMPLE_TOKENS[SAMPLES[k].t]=true});
+var SEV_ORDER={critical:0,high:1,medium:2,low:3,info:4};
+
 (function(){
   // Build pills
   var pc=document.getElementById('pills');
@@ -796,11 +801,6 @@ function appendVal(el,v){
 }
 
 /* \u2500\u2500\u2500 JWT Security Linter (Issue #3) \u2500\u2500\u2500 */
-var SAMPLE_TOKENS={};
-Object.keys(SAMPLES).forEach(function(k){SAMPLE_TOKENS[SAMPLES[k].t]=true});
-
-var SEV_ORDER={critical:0,high:1,medium:2,low:3,info:4};
-
 function lintJwt(header,payload,rawToken){
   var findings=[];
   var now=Math.floor(Date.now()/1000);

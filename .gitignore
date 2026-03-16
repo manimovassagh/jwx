@@ -1,0 +1,8 @@
+bin/
+dist/
+*.exe
+*.log
+*.png
+*.jpg
+*.test
+.DS_Store

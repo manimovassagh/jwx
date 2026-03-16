@@ -40,11 +40,17 @@ jwx/
 - **golang-jwt/jwt/v5** — JWT parsing engine
 - **goreleaser** — cross-platform binary releases
 
+### Additional Libraries
+- **dustin/go-humanize** — relative time ("2 hours ago") and number formatting
+- **net/http** (stdlib) — JWKS endpoint fetching
+
 ### Design Principles
 - Core logic in `internal/` — both CLI and plugin use same engine
-- Plugin is a thin wrapper calling the Go binary
+- Plugin is a thin wrapper calling the Go binary via Bash tool
 - Pipe-friendly: reads stdin, supports `--json` output, respects `NO_COLOR`
 - Single binary, zero runtime dependencies
+- Stdin detection: if stdin is a TTY and no token arg, print usage help (don't block)
+- No config file — all options via flags. Keep it simple.
 
 ## CLI Commands
 
@@ -56,10 +62,12 @@ jwx decode --json           # Raw JSON output for scripting
 jwx version                 # Version info
 ```
 
-### v0.2 — Encode & Sign
+### v0.2 — Sign (create tokens)
+`encode` and `sign` are merged into one command — `sign`. Creating a JWT always involves signing.
 ```
-jwx encode --alg HS256 --secret mykey '{"sub":"1234"}'
-jwx sign --key private.pem --alg RS256 payload.json
+jwx sign --alg HS256 --secret mykey '{"sub":"1234"}'
+jwx sign --alg RS256 --key private.pem '{"sub":"1234"}'
+jwx sign --alg RS256 --key private.pem --from payload.json
 ```
 
 ### v0.3 — Verify & Inspect
@@ -110,18 +118,37 @@ When you run `jwx decode <token>`:
 - **`--no-color`:** Plain text (for logging, CI)
 - Respects `NO_COLOR` environment variable
 
+## Exit Codes
+- `0` — success
+- `1` — invalid/malformed token
+- `2` — expired token (decode still shows output, exits 2 as warning)
+- `3` — signature verification failed
+- `4` — key error (file not found, wrong format)
+- `5` — network error (JWKS fetch failed)
+
 ## Claude Code Plugin
 
+The plugin calls the `jwx` binary via Bash. Users must have `jwx` installed (`go install` or `brew`).
+
+### plugin.json
+```json
+{
+  "name": "jwx",
+  "description": "Decode, verify, and audit JWT tokens",
+  "version": "0.1.0"
+}
+```
+
 ### Commands
-- `/jwt decode <token>` — decode and display in session
-- `/jwt verify <token> --key <path>` — verify signature
-- `/jwt audit <token>` — security analysis
+- **`/jwt <token>`** — decode a JWT token (runs `jwx decode <token> --no-color`)
+- **`/jwt verify <token> --key <path>`** — verify signature
+- **`/jwt audit <token>`** — security analysis
 
 ### Skills
-- `jwt-decode` — auto-triggers when Claude sees a JWT token in conversation context, offers to decode it
+- **`jwt-decode`** — description triggers on phrases like "decode this JWT", "what's in this token", or when user pastes a JWT (pattern: `eyJ...`). Runs `jwx decode` via Bash and presents results.
 
 ### Agents
-- `jwt-auditor` — deep security analysis agent that checks for common JWT vulnerabilities
+- **`jwt-auditor`** — security analysis agent. Given a JWT, it runs `jwx audit` and `jwx decode`, then explains findings in context. Has access to Bash, Read, Grep tools.
 
 ## Star-Getting Strategy
 
@@ -133,12 +160,21 @@ When you run `jwx decode <token>`:
 6. Claude Code plugin listing
 7. Pipe-friendly: `echo $TOKEN | jwx decode`, `jwx decode --json | jq .`
 
+## Makefile Targets
+- `make build` — `go build ./cmd/jwx`
+- `make test` — `go test ./...`
+- `make lint` — `golangci-lint run`
+- `make install` — `go install ./cmd/jwx`
+- `make release` — goreleaser snapshot
+
 ## Testing Strategy
 
 - Unit tests for each `internal/` package
 - Table-driven tests for JWT decode/encode edge cases
 - Integration tests for CLI commands (run binary, check output)
 - Golden file tests for display output (catch visual regressions)
+- Test fixtures in `testdata/` directory (sample tokens, keys)
+- Golden file update: `go test ./... -update` flag
 
 ## Security Considerations
 

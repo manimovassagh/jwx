@@ -295,6 +295,28 @@ pre{font-family:var(--mono);font-size:.85rem;line-height:1.65;white-space:pre-wr
   background:linear-gradient(90deg,var(--ts-bg),transparent);
 }
 
+/* ─── Claim explanation tooltips ─── */
+.claim-tip{position:relative;cursor:help}
+.claim-tip:hover{text-decoration:underline;text-decoration-style:dotted;text-underline-offset:3px}
+.claim-tip::after{
+  content:attr(data-tip);
+  position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);
+  background:#1e1e24;color:#e4e4e7;font-family:var(--font);font-size:.72rem;font-weight:400;
+  line-height:1.4;white-space:normal;max-width:250px;width:max-content;
+  padding:.4rem .65rem;border-radius:6px;
+  pointer-events:none;opacity:0;z-index:20;
+  box-shadow:0 4px 12px rgba(0,0,0,.3);
+}
+.claim-tip::before{
+  content:'';position:absolute;bottom:calc(100% + 2px);left:50%;transform:translateX(-50%);
+  border:5px solid transparent;border-top-color:#1e1e24;
+  pointer-events:none;opacity:0;z-index:20;
+}
+.claim-tip:hover::after,.claim-tip:hover::before{opacity:1}
+@media (prefers-reduced-motion: no-preference) {
+  .claim-tip::after,.claim-tip::before{transition:opacity .15s}
+}
+
 /* Empty / error state */
 .empty-state{
   display:flex;flex-direction:column;align-items:center;justify-content:center;
@@ -575,6 +597,36 @@ function makeSection(name,cls,dotCls,obj,timestamps){
   return sec;
 }
 
+var CLAIM_TIPS={
+  alg:'Algorithm used to sign the token',
+  typ:'Token type (usually JWT)',
+  kid:'Key ID — identifies which key was used to sign',
+  jku:'JWK Set URL — where to find the signing keys',
+  x5u:'X.509 URL — certificate for the signing key',
+  x5c:'X.509 Certificate Chain',
+  cty:'Content type of the token payload',
+  iss:'Issuer — who created and signed this token',
+  sub:'Subject — the user or entity this token represents',
+  aud:'Audience — intended recipient(s) of the token',
+  exp:'Expiration time — token is invalid after this',
+  nbf:'Not before — token is invalid before this time',
+  iat:'Issued at — when the token was created',
+  jti:'JWT ID — unique identifier for this token',
+  auth_time:'Authentication time — when the user last logged in',
+  azp:'Authorized party — the client that requested the token',
+  scope:'OAuth scopes — permissions granted to this token',
+  nonce:'Nonce — ties the token to a specific auth request',
+  at_hash:'Access token hash — binds ID token to access token',
+  c_hash:'Code hash — binds ID token to authorization code',
+  email:'Email address of the authenticated user',
+  name:'Full name of the authenticated user',
+  role:'User role for access control',
+  roles:'User roles for access control',
+  permissions:'Granted permissions for fine-grained access',
+  org:'Organization the user belongs to',
+  client_id:'OAuth client ID that requested this token'
+};
+
 function renderJson(el,obj,ts){
   var json=JSON.stringify(obj,null,2);
   json.split('\n').forEach(function(line,i){
@@ -583,7 +635,8 @@ function renderJson(el,obj,ts){
     if(kv){
       el.appendChild(document.createTextNode(kv[1]));
       var k=document.createElement('span');k.className='json-key';k.textContent='"'+kv[2]+'"';
-      el.appendChild(k);el.appendChild(document.createTextNode(': '));
+      if(CLAIM_TIPS[kv[2]]){var w=document.createElement('span');w.className='claim-tip';w.setAttribute('data-tip',CLAIM_TIPS[kv[2]]);w.appendChild(k);el.appendChild(w)}else{el.appendChild(k)}
+      el.appendChild(document.createTextNode(': '));
       appendVal(el,kv[3]);
       if(ts&&/^"(exp|iat|nbf|auth_time)"/.test(line.trim())){
         var m=line.match(/"(exp|iat|nbf|auth_time)"\s*:\s*(\d+)/);

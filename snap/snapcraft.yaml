@@ -1,0 +1,32 @@
+name: jwx
+base: core24
+version: git
+summary: A beautiful CLI for working with JSON Web Tokens
+description: |
+  jwx is a beautiful CLI tool for working with JWTs — decode, encode,
+  sign, verify, inspect, and more. Features colorized terminal output
+  and security auditing. Privacy first — tokens never leave your machine.
+grade: stable
+confinement: strict
+license: MIT
+
+architectures:
+  - build-on: [amd64]
+  - build-on: [arm64]
+
+parts:
+  jwx:
+    plugin: go
+    source: .
+    source-type: local
+    build-snaps:
+      - go/1.23/stable
+    override-build: |
+      go build -ldflags "-s -w -X main.version=${SNAPCRAFT_PROJECT_VERSION}" -o $SNAPCRAFT_PART_INSTALL/bin/jwx ./cmd/jwx
+
+apps:
+  jwx:
+    command: bin/jwx
+    plugs:
+      - home
+      - network

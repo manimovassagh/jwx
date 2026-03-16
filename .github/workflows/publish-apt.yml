@@ -1,0 +1,98 @@
+# APT/Debian Repository Publishing
+#
+# This workflow creates an APT repository from the .deb files produced by
+# GoReleaser and publishes it to the `apt-repo` branch. Users can install
+# jwx via apt by running:
+#
+#   # Add the repository
+#   echo "deb [trusted=yes] https://raw.githubusercontent.com/manimovassagh/jwx/apt-repo/ /" | sudo tee /etc/apt/sources.list.d/jwx.list
+#   sudo apt update
+#   sudo apt install jwx
+#
+
+name: Publish to APT Repository
+
+on:
+  workflow_call:
+    inputs:
+      version:
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  publish-apt:
+    name: Publish APT Repository
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download .deb files from release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ inputs.version }}
+          REPO: ${{ github.repository }}
+        run: |
+          mkdir -p apt-repo
+          cd apt-repo
+          gh release download "v${VERSION}" \
+            --repo "${REPO}" \
+            --pattern "*.deb"
+          echo "Downloaded .deb files:"
+          ls -la *.deb
+
+      - name: Generate APT repository metadata
+        run: |
+          cd apt-repo
+          dpkg-scanpackages --multiversion . /dev/null > Packages
+          gzip -k -f Packages
+
+      - name: Generate Release file
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          cd apt-repo
+          cat > Release <<EOF
+          Origin: jwx
+          Label: jwx
+          Suite: stable
+          Codename: stable
+          Version: ${VERSION}
+          Architectures: amd64 arm64
+          Components: main
+          Description: APT repository for jwx - A beautiful CLI for working with JSON Web Tokens
+          Date: $(date -Ru)
+          EOF
+          # Remove leading whitespace from heredoc
+          sed -i 's/^          //' Release
+
+          # Add hashes
+          {
+            echo "MD5Sum:"
+            for f in Packages Packages.gz; do
+              echo " $(md5sum "$f" | cut -d' ' -f1) $(wc -c < "$f") $f"
+            done
+            echo "SHA256:"
+            for f in Packages Packages.gz; do
+              echo " $(sha256sum "$f" | cut -d' ' -f1) $(wc -c < "$f") $f"
+            done
+          } >> Release
+
+      - name: Deploy to apt-repo branch
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          VERSION: ${{ inputs.version }}
+        run: |
+          cd apt-repo
+          git init
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -b apt-repo
+          git add .
+          git commit -m "Update APT repository for v${VERSION}"
+          git remote add origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${REPO}.git"
+          git push --force origin apt-repo

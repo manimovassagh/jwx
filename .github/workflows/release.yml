@@ -57,3 +57,10 @@ jobs:
       version: ${{ needs.release.outputs.version }}
     secrets:
       HOMEBREW_TAP_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+
+  apt:
+    name: Publish APT
+    needs: release
+    uses: ./.github/workflows/publish-apt.yml
+    with:
+      version: ${{ needs.release.outputs.version }}

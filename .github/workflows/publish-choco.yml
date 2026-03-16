@@ -1,0 +1,71 @@
+name: Publish to Chocolatey
+
+on:
+  workflow_call:
+    inputs:
+      version:
+        required: true
+        type: string
+    secrets:
+      CHOCOLATEY_API_KEY:
+        required: true
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  publish:
+    name: Chocolatey
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Download Windows amd64 zip from release
+        env:
+          VERSION: ${{ inputs.version }}
+          REPO: ${{ github.repository }}
+        run: |
+          $tag = "v${env:VERSION}"
+          $url = "https://github.com/${env:REPO}/releases/download/${tag}/jwx_${env:VERSION}_windows_amd64.zip"
+          Invoke-WebRequest -Uri $url -OutFile jwx.zip
+          Expand-Archive jwx.zip -DestinationPath tools
+
+      - name: Create nuspec
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          @"
+          <?xml version="1.0" encoding="utf-8"?>
+          <package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
+            <metadata>
+              <id>jwx</id>
+              <version>${env:VERSION}</version>
+              <title>jwx - JWT CLI Tool</title>
+              <authors>Mani Movassagh</authors>
+              <owners>manimovassagh</owners>
+              <projectUrl>https://github.com/manimovassagh/jwx</projectUrl>
+              <iconUrl>https://raw.githubusercontent.com/manimovassagh/jwx/main/docs/icon.png</iconUrl>
+              <licenseUrl>https://github.com/manimovassagh/jwx/blob/main/LICENSE</licenseUrl>
+              <requireLicenseAcceptance>false</requireLicenseAcceptance>
+              <projectSourceUrl>https://github.com/manimovassagh/jwx</projectSourceUrl>
+              <docsUrl>https://github.com/manimovassagh/jwx#readme</docsUrl>
+              <bugTrackerUrl>https://github.com/manimovassagh/jwx/issues</bugTrackerUrl>
+              <tags>jwt json cli security token decode encode sign verify</tags>
+              <summary>A beautiful CLI for working with JSON Web Tokens</summary>
+              <description>jwx is a beautiful CLI tool for working with JWTs — decode, encode, sign, verify, inspect, and more. Features colorized terminal output and security auditing. Privacy first — tokens never leave your machine.</description>
+              <releaseNotes>https://github.com/manimovassagh/jwx/releases/tag/v${env:VERSION}</releaseNotes>
+              <copyright>2026 Mani Movassagh</copyright>
+            </metadata>
+            <files>
+              <file src="tools\**" target="tools" />
+            </files>
+          </package>
+          "@ | Out-File -Encoding utf8 jwx.nuspec
+
+      - name: Pack and push to Chocolatey
+        env:
+          CHOCO_API_KEY: ${{ secrets.CHOCOLATEY_API_KEY }}
+          VERSION: ${{ inputs.version }}
+        run: |
+          choco pack jwx.nuspec
+          choco push "jwx.${env:VERSION}.nupkg" --source https://push.chocolatey.org/ --api-key "${env:CHOCO_API_KEY}"

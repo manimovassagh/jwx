@@ -15,10 +15,18 @@ jobs:
   release:
     name: Release
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
     steps:
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
+
+      - name: Extract version
+        id: version
+        env:
+          REF_NAME: ${{ github.ref_name }}
+        run: echo "version=${REF_NAME#v}" >> "$GITHUB_OUTPUT"
 
       - uses: actions/setup-go@v6
         with:
@@ -31,5 +39,21 @@ jobs:
           args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          HOMEBREW_TAP_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
-          CHOCOLATEY_API_KEY: ${{ secrets.CHOCOLATEY_API_KEY }}
+
+  chocolatey:
+    name: Publish Chocolatey
+    needs: release
+    uses: ./.github/workflows/publish-choco.yml
+    with:
+      version: ${{ needs.release.outputs.version }}
+    secrets:
+      CHOCOLATEY_API_KEY: ${{ secrets.CHOCOLATEY_API_KEY }}
+
+  homebrew:
+    name: Publish Homebrew
+    needs: release
+    uses: ./.github/workflows/publish-homebrew.yml
+    with:
+      version: ${{ needs.release.outputs.version }}
+    secrets:
+      HOMEBREW_TAP_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}

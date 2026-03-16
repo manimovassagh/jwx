@@ -1,0 +1,66 @@
+name: Publish to Homebrew
+
+on:
+  workflow_call:
+    inputs:
+      version:
+        required: true
+        type: string
+    secrets:
+      HOMEBREW_TAP_TOKEN:
+        required: true
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  publish:
+    name: Homebrew
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Update Homebrew formula
+        env:
+          HOMEBREW_TAP_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+          VERSION: ${{ inputs.version }}
+          REPO: ${{ github.repository }}
+        run: |
+          TAG="v${VERSION}"
+          TARBALL_URL="https://github.com/${REPO}/archive/refs/tags/${TAG}.tar.gz"
+          SHA256=$(curl -sL "${TARBALL_URL}" | sha256sum | awk '{print $1}')
+
+          cat > /tmp/jwx.rb <<FORMULA_EOF
+          class Jwx < Formula
+            desc "A beautiful CLI for working with JSON Web Tokens"
+            homepage "https://github.com/manimovassagh/jwx"
+            url "${TARBALL_URL}"
+            sha256 "${SHA256}"
+            license "MIT"
+
+            depends_on "go" => :build
+
+            def install
+              ldflags = %W[
+                -s -w
+                -X main.version=#{version}
+                -X main.commit=HEAD
+                -X main.date=#{time.iso8601}
+              ]
+              system "go", "build", *std_go_args(ldflags:), "./cmd/jwx"
+            end
+
+            test do
+              system bin/"jwx", "version"
+            end
+          end
+          FORMULA_EOF
+
+          git clone "https://x-access-token:${HOMEBREW_TAP_TOKEN}@github.com/manimovassagh/homebrew-tap.git" tap
+          cp /tmp/jwx.rb tap/Formula/jwx.rb
+          cd tap
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add Formula/jwx.rb
+          git diff --cached --quiet || git commit -m "jwx ${TAG}"
+          git push

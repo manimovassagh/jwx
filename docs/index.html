@@ -206,9 +206,28 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow:hid
   letter-spacing:.1em;margin-bottom:.75rem;display:flex;align-items:center;gap:.5rem;
 }
 .panel-label span{font-family:var(--mono)}
+/* Overlay container for colored highlight behind transparent textarea */
+.encoded-wrap{
+  position:relative;flex:1;width:100%;min-height:0;display:flex;
+}
+.encoded-highlight{
+  position:absolute;top:0;left:0;right:0;bottom:0;
+  background:var(--input-bg);border:1px solid transparent;
+  border-radius:10px;font-family:var(--mono);font-size:.92rem;
+  padding:1.2rem;line-height:1.8;
+  white-space:pre-wrap;word-break:break-all;
+  overflow:auto;pointer-events:none;
+  color:transparent;
+}
+.encoded-highlight .jwt-header{color:#6366f1}
+.encoded-highlight .jwt-dot{color:var(--muted)}
+.encoded-highlight .jwt-payload{color:#22c55e}
+.encoded-highlight .jwt-sig{color:#f59e0b}
 .encoded-area{
-  flex:1;width:100%;background:var(--input-bg);border:1px solid var(--border);
-  border-radius:10px;color:var(--input-text);font-family:var(--mono);font-size:.92rem;
+  position:relative;z-index:1;
+  flex:1;width:100%;background:transparent;border:1px solid var(--border);
+  border-radius:10px;color:transparent;caret-color:var(--input-text);
+  font-family:var(--mono);font-size:.92rem;
   padding:1.2rem;resize:none;outline:none;line-height:1.8;
 }
 .encoded-area:focus{
@@ -217,6 +236,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow:hid
 }
 .encoded-area::placeholder{color:var(--input-placeholder)}
 .encoded-area.flash{border-color:var(--accent)!important;box-shadow:0 0 0 3px rgba(109,93,252,.25)!important}
+/* When textarea is empty, show placeholder (needs non-transparent text for placeholder) */
+.encoded-area:placeholder-shown{color:transparent}
 .pill-row{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.75rem}
 .pill{
   cursor:pointer;background:var(--surface-2);border:1px solid var(--border);
@@ -367,7 +388,7 @@ pre{font-family:var(--mono);font-size:.85rem;line-height:1.65;white-space:pre-wr
   .badge-row{display:none}
   .panel-left,.panel-right{overflow:visible}
   .panel-left{border-right:none;border-bottom:1px solid var(--border)}
-  .encoded-area{font-size:16px}
+  .encoded-area,.encoded-highlight{font-size:16px}
 }
 /* ─── SMALL MOBILE: touch targets + footer fix (Issues from mobile audit) ─── */
 @media(max-width:480px){
@@ -375,7 +396,7 @@ pre{font-family:var(--mono);font-size:.85rem;line-height:1.65;white-space:pre-wr
   .pill{min-height:44px;padding:.55rem 1rem}
   .copy-btn{min-height:44px;padding:.45rem .85rem}
   .theme-toggle{width:44px;height:44px}
-  .encoded-area{font-size:16px}
+  .encoded-area,.encoded-highlight{font-size:16px}
 }
 </style>
 <script type="application/ld+json">
@@ -409,7 +430,10 @@ pre{font-family:var(--mono);font-size:.85rem;line-height:1.65;white-space:pre-wr
     <!-- LEFT: Encoded JWT (dark) -->
     <div class="panel-left">
       <label for="input" class="panel-label"><span>Encoded</span> — paste or pick a sample</label>
-      <textarea class="encoded-area" id="input" spellcheck="false" autocomplete="off" placeholder="Paste your encoded JWT here..." aria-label="Encoded JWT input"></textarea>
+      <div class="encoded-wrap">
+        <div class="encoded-highlight" id="highlight" aria-hidden="true"></div>
+        <textarea class="encoded-area" id="input" spellcheck="false" autocomplete="off" placeholder="Paste your encoded JWT here..." aria-label="Encoded JWT input"></textarea>
+      </div>
       <div class="pill-row" id="pills" role="radiogroup" aria-label="Sample JWT tokens"></div>
     </div>
 
@@ -482,13 +506,16 @@ function getOsTheme(){
 
   // Auto-decode with 150ms debounce (Issue #38)
   var inp=document.getElementById('input');
+  var hl=document.getElementById('highlight');
   var debouncedDecode=debounce(decode,150);
-  inp.addEventListener('input',debouncedDecode);
+  inp.addEventListener('input',function(){debouncedDecode();highlightJwt()});
   inp.addEventListener('paste',function(){
     inp.classList.add('flash');
     setTimeout(function(){inp.classList.remove('flash')},300);
-    setTimeout(decode,10);
+    setTimeout(function(){decode();highlightJwt()},10);
   });
+  // Sync scroll between textarea and highlight backdrop
+  inp.addEventListener('scroll',function(){hl.scrollTop=inp.scrollTop;hl.scrollLeft=inp.scrollLeft});
 
   // Theme toggle via addEventListener — no inline onclick (Issue #18, #58)
   document.getElementById('theme-btn').addEventListener('click',toggleTheme);
@@ -508,7 +535,7 @@ function getOsTheme(){
     if(cleaned.toLowerCase().indexOf('bearer ')===0)cleaned=cleaned.slice(7);
     if(isJwtFormat(cleaned)){
       inp.value=decoded;
-      decode();
+      decode();highlightJwt();
     } else {
       pick('rich');
     }
@@ -520,13 +547,34 @@ function getOsTheme(){
 function pick(k){
   document.querySelectorAll('.pill').forEach(function(p){var sel=p.getAttribute('data-key')===k;p.classList.toggle('active',sel);p.setAttribute('aria-checked',sel?'true':'false')});
   document.getElementById('input').value=SAMPLES[k].t;
-  decode();
+  decode();highlightJwt();
 }
 
 function b64(s){
   s=s.replace(/-/g,'+').replace(/_/g,'/');
   while(s.length%4)s+='=';
   return decodeURIComponent(atob(s).split('').map(function(c){return'%'+('00'+c.charCodeAt(0).toString(16)).slice(-2)}).join(''));
+}
+
+/* ─── JWT syntax highlight in encoded panel ─── */
+function highlightJwt(){
+  var inp=document.getElementById('input');
+  var hl=document.getElementById('highlight');
+  var val=inp.value;
+  if(!val){hl.textContent='';return}
+  var parts=val.split('.');
+  // Clear previous content
+  while(hl.firstChild)hl.removeChild(hl.firstChild);
+  if(parts.length===3){
+    var hSpan=document.createElement('span');hSpan.className='jwt-header';hSpan.textContent=parts[0];
+    var d1=document.createElement('span');d1.className='jwt-dot';d1.textContent='.';
+    var pSpan=document.createElement('span');pSpan.className='jwt-payload';pSpan.textContent=parts[1];
+    var d2=document.createElement('span');d2.className='jwt-dot';d2.textContent='.';
+    var sSpan=document.createElement('span');sSpan.className='jwt-sig';sSpan.textContent=parts[2];
+    hl.appendChild(hSpan);hl.appendChild(d1);hl.appendChild(pSpan);hl.appendChild(d2);hl.appendChild(sSpan);
+  } else {
+    hl.textContent=val;
+  }
 }
 
 function decode(){

@@ -3,6 +3,7 @@ package commands
 import (
 	"bytes"
 	"fmt"
+	"os"
 	"runtime"
 	"testing"
 
@@ -285,5 +286,58 @@ func TestRootCmd_NonJWTArg(t *testing.T) {
 	// Should show help (no error)
 	if err != nil {
 		t.Fatalf("rootCmd with non-JWT arg error = %v", err)
+	}
+}
+
+func TestExecute(t *testing.T) {
+	// Execute with no args should show help and not error
+	err := Execute()
+	if err != nil {
+		t.Fatalf("Execute() with no args error = %v", err)
+	}
+}
+
+func TestLooksLikeJWT_EdgeCases(t *testing.T) {
+	tests := []struct {
+		input string
+		want  bool
+	}{
+		{"eyJhbGciOiJIUzI1NiJ9.eyJ0ZXN0IjoiMSJ9.sig", true},
+		{"eyJ.a.b", true},
+		{"eyJ.a.b.c", false},      // 4 parts
+		{"  eyJ.a.b  \n", true},   // whitespace
+		{"bearer eyJ.a.b", false}, // bearer prefix breaks it
+		{"EYJ.a.b", false},        // wrong case
+	}
+
+	for _, tt := range tests {
+		got := looksLikeJWT(tt.input)
+		if got != tt.want {
+			t.Errorf("looksLikeJWT(%q) = %v, want %v", tt.input, got, tt.want)
+		}
+	}
+}
+
+func TestSignCmd_FromFile(t *testing.T) {
+	// Create temp claims file
+	f, err := os.CreateTemp("", "claims-*.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer func() { _ = os.Remove(f.Name()) }()
+
+	if _, err := f.WriteString(`{"sub":"file-test"}`); err != nil {
+		t.Fatal(err)
+	}
+	_ = f.Close()
+
+	signAlg = "HS256"
+	signSecret = "test"
+	signFrom = f.Name()
+	defer func() { signFrom = "" }()
+
+	err = runSign(signCmd, []string{})
+	if err != nil {
+		t.Fatalf("sign from file error = %v", err)
 	}
 }

@@ -28,15 +28,17 @@ checksum:
   name_template: "checksums.txt"
   algorithm: sha256
 
-homebrew_casks:
-  - name: jwx
-    repository:
+brews:
+  - repository:
       owner: manimovassagh
       name: homebrew-tap
     homepage: "https://github.com/manimovassagh/jwx"
-    description: "JWX - JSON Web Token toolkit"
+    description: "A beautiful CLI for working with JSON Web Tokens"
     license: "MIT"
-    skip_upload: true
+    install: |
+      bin.install "jwx"
+    test: |
+      system bin/"jwx", "version"
 
 changelog:
   sort: asc

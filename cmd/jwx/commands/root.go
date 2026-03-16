@@ -49,10 +49,24 @@ func Execute() error {
 
 	err := rootCmd.Execute()
 	if err != nil {
-		// Check if the error is about an unknown command that's actually a JWT
 		errMsg := err.Error()
 		if strings.Contains(errMsg, "unknown command") {
-			// Extract the token from os.Args
+			// Check flags from os.Args since cobra didn't parse them
+			for _, arg := range os.Args[1:] {
+				switch arg {
+				case "--json", "-j":
+					jsonOutput = true
+				case "--no-color":
+					display.NoColor = true
+				case "--clipboard", "-c":
+					clipboardFlag = true
+				}
+			}
+			if noColor || os.Getenv("NO_COLOR") != "" {
+				display.NoColor = true
+			}
+
+			// Find and decode the JWT token
 			for _, arg := range os.Args[1:] {
 				if looksLikeJWT(arg) {
 					return runDecode(rootCmd, []string{arg})

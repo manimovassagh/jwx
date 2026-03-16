@@ -48,6 +48,30 @@ brews:
     test: |
       system bin/"jwx", "version"
 
+chocolateys:
+  - name: jwx
+    title: "jwx - JWT CLI Tool"
+    authors: "Mani Movassagh"
+    project_url: "https://github.com/manimovassagh/jwx"
+    icon_url: "https://raw.githubusercontent.com/manimovassagh/jwx/main/docs/icon.png"
+    copyright: "2026 Mani Movassagh"
+    license_url: "https://github.com/manimovassagh/jwx/blob/main/LICENSE"
+    require_license_acceptance: false
+    project_source_url: "https://github.com/manimovassagh/jwx"
+    docs_url: "https://github.com/manimovassagh/jwx#readme"
+    bug_tracker_url: "https://github.com/manimovassagh/jwx/issues"
+    tags: "jwt json cli security token decode encode sign verify"
+    summary: "A beautiful CLI for working with JSON Web Tokens"
+    description: |
+      jwx is a beautiful CLI tool for working with JWTs — decode, encode,
+      sign, verify, inspect, and more. Features colorized terminal output
+      and security auditing.
+    release_notes: "https://github.com/manimovassagh/jwx/releases/tag/v{{ .Version }}"
+    api_key: "{{ .Env.CHOCOLATEY_API_KEY }}"
+    source_repo: "https://push.chocolatey.org/"
+    skip_publish: false
+    goamd64: v1
+
 nfpms:
   - id: jwx
     package_name: jwx

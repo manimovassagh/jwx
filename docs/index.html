@@ -557,6 +557,36 @@ function getOsTheme(){
   return'dark';
 }
 
+var CLAIM_TIPS={
+  alg:'Algorithm used to sign the token',
+  typ:'Token type (usually JWT)',
+  kid:'Key ID — identifies which key was used to sign',
+  jku:'JWK Set URL — where to find the signing keys',
+  x5u:'X.509 URL — certificate for the signing key',
+  x5c:'X.509 Certificate Chain',
+  cty:'Content type of the token payload',
+  iss:'Issuer — who created and signed this token',
+  sub:'Subject — the user or entity this token represents',
+  aud:'Audience — intended recipient(s) of the token',
+  exp:'Expiration time — token is invalid after this',
+  nbf:'Not before — token is invalid before this time',
+  iat:'Issued at — when the token was created',
+  jti:'JWT ID — unique identifier for this token',
+  auth_time:'Authentication time — when the user last logged in',
+  azp:'Authorized party — the client that requested the token',
+  scope:'OAuth scopes — permissions granted to this token',
+  nonce:'Nonce — ties the token to a specific auth request',
+  at_hash:'Access token hash — binds ID token to access token',
+  c_hash:'Code hash — binds ID token to authorization code',
+  email:'Email address of the authenticated user',
+  name:'Full name of the authenticated user',
+  role:'User role for access control',
+  roles:'User roles for access control',
+  permissions:'Granted permissions for fine-grained access',
+  org:'Organization the user belongs to',
+  client_id:'OAuth client ID that requested this token'
+};
+
 (function(){
   // Build pills
   var pc=document.getElementById('pills');
@@ -730,36 +760,6 @@ function makeSection(name,cls,dotCls,obj,timestamps){
   sec.appendChild(top);sec.appendChild(body);
   return sec;
 }
-
-var CLAIM_TIPS={
-  alg:'Algorithm used to sign the token',
-  typ:'Token type (usually JWT)',
-  kid:'Key ID — identifies which key was used to sign',
-  jku:'JWK Set URL — where to find the signing keys',
-  x5u:'X.509 URL — certificate for the signing key',
-  x5c:'X.509 Certificate Chain',
-  cty:'Content type of the token payload',
-  iss:'Issuer — who created and signed this token',
-  sub:'Subject — the user or entity this token represents',
-  aud:'Audience — intended recipient(s) of the token',
-  exp:'Expiration time — token is invalid after this',
-  nbf:'Not before — token is invalid before this time',
-  iat:'Issued at — when the token was created',
-  jti:'JWT ID — unique identifier for this token',
-  auth_time:'Authentication time — when the user last logged in',
-  azp:'Authorized party — the client that requested the token',
-  scope:'OAuth scopes — permissions granted to this token',
-  nonce:'Nonce — ties the token to a specific auth request',
-  at_hash:'Access token hash — binds ID token to access token',
-  c_hash:'Code hash — binds ID token to authorization code',
-  email:'Email address of the authenticated user',
-  name:'Full name of the authenticated user',
-  role:'User role for access control',
-  roles:'User roles for access control',
-  permissions:'Granted permissions for fine-grained access',
-  org:'Organization the user belongs to',
-  client_id:'OAuth client ID that requested this token'
-};
 
 function renderJson(el,obj,ts){
   var json=JSON.stringify(obj,null,2);

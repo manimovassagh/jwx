@@ -36,7 +36,7 @@ homebrew_casks:
     homepage: "https://github.com/manimovassagh/jwx"
     description: "JWX - JSON Web Token toolkit"
     license: "MIT"
-    skip_upload: auto
+    skip_upload: true
 
 changelog:
   sort: asc

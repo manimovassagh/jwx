@@ -10,7 +10,8 @@ formatters:
     - goimports
   settings:
     goimports:
-      local-prefixes: github.com/manimovassagh/jwx
+      local-prefixes:
+        - github.com/manimovassagh/jwx
 
 linters:
   enable:
@@ -32,8 +33,8 @@ linters:
         - style
         - performance
 
-issues:
-  exclude-rules:
-    - path: _test\.go
-      linters:
-        - gocritic
+  exclusions:
+    rules:
+      - path: _test\.go
+        linters:
+          - gocritic

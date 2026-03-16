@@ -9,11 +9,13 @@ import (
 	"github.com/mattn/go-isatty"
 	"github.com/spf13/cobra"
 
+	"github.com/manimovassagh/jwx/internal/clipboard"
 	"github.com/manimovassagh/jwx/internal/display"
 	"github.com/manimovassagh/jwx/internal/jwt"
 )
 
 var jsonOutput bool
+var clipboardFlag bool
 
 var decodeCmd = &cobra.Command{
 	Use:   "decode [token]",
@@ -21,27 +23,34 @@ var decodeCmd = &cobra.Command{
 	Long: `Decode a JWT token and display its header, payload, and signature
 with beautiful colorized output.
 
-Pass the token as an argument or pipe it via stdin:
+Pass the token as an argument, read from clipboard, or pipe via stdin:
   jwx decode eyJhbGci...
-  echo "eyJhbGci..." | jwx decode
-  pbpaste | jwx decode`,
+  jwx decode --clipboard
+  echo "eyJhbGci..." | jwx decode`,
 	Args: cobra.MaximumNArgs(1),
 	RunE: runDecode,
 }
 
 func init() {
 	decodeCmd.Flags().BoolVarP(&jsonOutput, "json", "j", false, "Output as JSON (for piping)")
+	decodeCmd.Flags().BoolVarP(&clipboardFlag, "clipboard", "c", false, "Read JWT from system clipboard")
 }
 
 func runDecode(cmd *cobra.Command, args []string) error {
 	var tokenStr string
 
-	if len(args) > 0 {
+	switch {
+	case clipboardFlag:
+		text, err := clipboard.Read()
+		if err != nil {
+			return fmt.Errorf("failed to read from clipboard: %w", err)
+		}
+		tokenStr = text
+	case len(args) > 0:
 		tokenStr = args[0]
-	} else {
-		// Check if stdin has data
+	default:
 		if isatty.IsTerminal(os.Stdin.Fd()) && !isatty.IsCygwinTerminal(os.Stdin.Fd()) {
-			return fmt.Errorf("no token provided\n\nUsage: jwx decode <token>\n       echo <token> | jwx decode")
+			return fmt.Errorf("no token provided\n\nUsage: jwx decode <token>\n       jwx decode --clipboard\n       echo <token> | jwx decode")
 		}
 		scanner := bufio.NewScanner(os.Stdin)
 		if scanner.Scan() {

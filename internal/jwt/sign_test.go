@@ -123,7 +123,7 @@ func writeKeyToTempFile(t *testing.T, pemData []byte) string {
 	t.Helper()
 	dir := t.TempDir()
 	path := filepath.Join(dir, "key.pem")
-	if err := os.WriteFile(path, pemData, 0600); err != nil {
+	if err := os.WriteFile(path, pemData, 0o600); err != nil {
 		t.Fatalf("failed to write temp key file: %v", err)
 	}
 	return path

@@ -8,58 +8,98 @@ import (
 
 	"github.com/charmbracelet/lipgloss"
 	"github.com/dustin/go-humanize"
+
 	"github.com/manimovassagh/jwx/internal/jwt"
 )
 
+// NoColor disables color output when set to true. This is set by the
+// --no-color flag or the NO_COLOR environment variable.
+var NoColor bool
+
 var (
-	headerStyle = lipgloss.NewStyle().
+	headerStyle    lipgloss.Style
+	payloadStyle   lipgloss.Style
+	signatureStyle lipgloss.Style
+	titleStyle     lipgloss.Style
+	headerTitle    lipgloss.Style
+	payloadTitle   lipgloss.Style
+	sigTitle       lipgloss.Style
+	dimStyle       lipgloss.Style
+	warnStyle      lipgloss.Style
+	okStyle        lipgloss.Style
+	keyStyle       lipgloss.Style
+	stringStyle    lipgloss.Style
+	numberStyle    lipgloss.Style
+)
+
+func init() {
+	initStyles()
+}
+
+func initStyles() {
+	if NoColor {
+		headerStyle = lipgloss.NewStyle().
 			Border(lipgloss.RoundedBorder()).
-			BorderForeground(lipgloss.Color("63")). // blue
 			Padding(0, 1).
 			MarginBottom(0)
 
-	payloadStyle = lipgloss.NewStyle().
+		payloadStyle = lipgloss.NewStyle().
 			Border(lipgloss.RoundedBorder()).
-			BorderForeground(lipgloss.Color("42")). // green
 			Padding(0, 1).
 			MarginBottom(0)
 
-	signatureStyle = lipgloss.NewStyle().
+		signatureStyle = lipgloss.NewStyle().
 			Border(lipgloss.RoundedBorder()).
-			BorderForeground(lipgloss.Color("214")). // yellow/orange
 			Padding(0, 1)
 
-	titleStyle = lipgloss.NewStyle().
-			Bold(true)
+		titleStyle = lipgloss.NewStyle().Bold(true)
+		headerTitle = titleStyle
+		payloadTitle = titleStyle
+		sigTitle = titleStyle
 
-	headerTitle  = titleStyle.Foreground(lipgloss.Color("63"))
-	payloadTitle = titleStyle.Foreground(lipgloss.Color("42"))
-	sigTitle     = titleStyle.Foreground(lipgloss.Color("214"))
+		dimStyle = lipgloss.NewStyle()
+		warnStyle = lipgloss.NewStyle().Bold(true)
+		okStyle = lipgloss.NewStyle().Bold(true)
+		keyStyle = lipgloss.NewStyle().Bold(true)
+		stringStyle = lipgloss.NewStyle()
+		numberStyle = lipgloss.NewStyle()
+	} else {
+		headerStyle = lipgloss.NewStyle().
+			Border(lipgloss.RoundedBorder()).
+			BorderForeground(lipgloss.Color("63")).
+			Padding(0, 1).
+			MarginBottom(0)
 
-	dimStyle = lipgloss.NewStyle().
-			Foreground(lipgloss.Color("245"))
+		payloadStyle = lipgloss.NewStyle().
+			Border(lipgloss.RoundedBorder()).
+			BorderForeground(lipgloss.Color("42")).
+			Padding(0, 1).
+			MarginBottom(0)
 
-	warnStyle = lipgloss.NewStyle().
-			Foreground(lipgloss.Color("196")). // red
-			Bold(true)
+		signatureStyle = lipgloss.NewStyle().
+			Border(lipgloss.RoundedBorder()).
+			BorderForeground(lipgloss.Color("214")).
+			Padding(0, 1)
 
-	okStyle = lipgloss.NewStyle().
-		Foreground(lipgloss.Color("42")). // green
-		Bold(true)
+		titleStyle = lipgloss.NewStyle().Bold(true)
+		headerTitle = titleStyle.Foreground(lipgloss.Color("63"))
+		payloadTitle = titleStyle.Foreground(lipgloss.Color("42"))
+		sigTitle = titleStyle.Foreground(lipgloss.Color("214"))
 
-	keyStyle = lipgloss.NewStyle().
-			Foreground(lipgloss.Color("251")).
-			Bold(true)
-
-	stringStyle = lipgloss.NewStyle().
-			Foreground(lipgloss.Color("114")) // light green
-
-	numberStyle = lipgloss.NewStyle().
-			Foreground(lipgloss.Color("178")) // gold
-)
+		dimStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("245"))
+		warnStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("196")).Bold(true)
+		okStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("42")).Bold(true)
+		keyStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("251")).Bold(true)
+		stringStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("114"))
+		numberStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("178"))
+	}
+}
 
 // Render produces the beautiful colorized output for a decoded JWT.
 func Render(token *jwt.DecodedToken) string {
+	// Re-initialize styles in case NoColor was set after package init.
+	initStyles()
+
 	var sections []string
 
 	// Header
@@ -176,7 +216,7 @@ func sortedKeys(m map[string]interface{}) []string {
 	return keys
 }
 
-func orderKeys(keys []string, priority []string) []string {
+func orderKeys(keys, priority []string) []string {
 	seen := make(map[string]bool)
 	var result []string
 

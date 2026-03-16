@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>jwx - JWT Decoder</title>
+<meta name="description" content="Decode JSON Web Tokens instantly in your browser. Free, open-source, client-side JWT decoder with beautiful dark UI.">
+<meta name="keywords" content="JWT, JSON Web Token, decoder, debugger, base64, token, auth, OAuth">
+<meta property="og:title" content="jwx - JWT Decoder">
+<meta property="og:description" content="Decode JSON Web Tokens instantly in your browser. Free, open-source, client-side only.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://manimovassagh.github.io/jwx/">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="jwx - JWT Decoder">
+<meta name="twitter:description" content="Decode JSON Web Tokens instantly in your browser. Free, open-source, client-side only.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔑</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0d1117;--card:#161b22;--border:#30363d;--text:#e6edf3;--muted:#8b949e;
+  --blue:#58a6ff;--green:#3fb950;--yellow:#d29922;--red:#f85149;
+  --font-sans:'Inter',system-ui,-apple-system,sans-serif;
+  --font-mono:'JetBrains Mono','Fira Code',monospace;
+}
+html{font-size:16px}
+body{background:var(--bg);color:var(--text);font-family:var(--font-sans);line-height:1.6;min-height:100vh;display:flex;flex-direction:column}
+a{color:var(--blue);text-decoration:none}
+a:hover{text-decoration:underline}
+
+.container{max-width:900px;margin:0 auto;padding:0 1.25rem;width:100%}
+
+/* Header */
+header{padding:3rem 0 2rem;text-align:center}
+.logo{font-size:3.5rem;font-weight:700;font-family:var(--font-mono);background:linear-gradient(135deg,var(--blue),var(--green));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:-0.04em;margin-bottom:0.25rem}
+.tagline{color:var(--muted);font-size:1.05rem;margin-bottom:1.5rem}
+.badge-row{display:flex;gap:0.5rem;justify-content:center;flex-wrap:wrap}
+.badge-row a img{height:20px}
+
+/* Input area */
+.input-section{margin-bottom:1.5rem}
+.input-section label{display:block;font-weight:600;margin-bottom:0.5rem;font-size:0.9rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em}
+.input-wrap{position:relative}
+textarea{width:100%;min-height:120px;background:var(--card);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:var(--font-mono);font-size:0.85rem;padding:1rem;resize:vertical;outline:none;transition:border-color .2s}
+textarea:focus{border-color:var(--blue)}
+textarea::placeholder{color:var(--muted)}
+.btn-row{display:flex;gap:0.5rem;margin-top:0.75rem}
+button{cursor:pointer;border:none;border-radius:8px;font-family:var(--font-sans);font-size:0.85rem;font-weight:600;padding:0.5rem 1.25rem;transition:all .15s}
+.btn-primary{background:var(--blue);color:#fff}
+.btn-primary:hover{opacity:0.85}
+.btn-secondary{background:var(--border);color:var(--text)}
+.btn-secondary:hover{background:#3d444d}
+.btn-copy{background:transparent;border:1px solid var(--border);color:var(--muted);padding:0.3rem 0.7rem;font-size:0.75rem;border-radius:6px}
+.btn-copy:hover{border-color:var(--muted);color:var(--text)}
+
+/* Status */
+.status-bar{display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap;margin-bottom:1.5rem;min-height:1.75rem}
+.alg-badge,.expiry-badge{display:inline-flex;align-items:center;padding:0.2rem 0.65rem;border-radius:20px;font-size:0.75rem;font-weight:600;font-family:var(--font-mono)}
+.alg-badge{background:rgba(88,166,255,0.15);color:var(--blue);border:1px solid rgba(88,166,255,0.3)}
+.expiry-badge.valid{background:rgba(63,185,80,0.15);color:var(--green);border:1px solid rgba(63,185,80,0.3)}
+.expiry-badge.expired{background:rgba(248,81,73,0.15);color:var(--red);border:1px solid rgba(248,81,73,0.3)}
+
+/* Decoded sections */
+.decoded{display:none}
+.decoded.show{display:block}
+.section{background:var(--card);border-radius:10px;border:1px solid var(--border);margin-bottom:1rem;overflow:hidden}
+.section-header{display:flex;align-items:center;justify-content:space-between;padding:0.65rem 1rem;border-bottom:1px solid var(--border)}
+.section-label{font-weight:600;font-size:0.85rem;display:flex;align-items:center;gap:0.5rem}
+.section-dot{width:10px;height:10px;border-radius:50%;display:inline-block}
+.section.header-section{border-left:3px solid var(--blue)}
+.section.header-section .section-dot{background:var(--blue)}
+.section.payload-section{border-left:3px solid var(--green)}
+.section.payload-section .section-dot{background:var(--green)}
+.section.signature-section{border-left:3px solid var(--yellow)}
+.section.signature-section .section-dot{background:var(--yellow)}
+.section-body{padding:1rem;overflow-x:auto}
+pre{font-family:var(--font-mono);font-size:0.82rem;line-height:1.7;white-space:pre-wrap;word-break:break-all}
+
+/* JSON highlighting */
+.json-key{color:var(--blue)}
+.json-string{color:var(--green)}
+.json-number{color:var(--yellow)}
+.json-bool,.json-null{color:#bc8cff}
+.json-ts{color:var(--muted);font-size:0.78rem;font-style:italic}
+
+/* Error */
+.error-msg{background:rgba(248,81,73,0.1);border:1px solid rgba(248,81,73,0.3);border-radius:10px;padding:1rem;color:var(--red);font-size:0.9rem;margin-bottom:1rem;display:none}
+.error-msg.show{display:block}
+
+/* Footer */
+footer{margin-top:auto;padding:2.5rem 0 2rem;text-align:center;border-top:1px solid var(--border)}
+.footer-brand{font-family:var(--font-mono);font-weight:600;font-size:1.1rem;margin-bottom:0.5rem}
+.footer-links{display:flex;gap:1.5rem;justify-content:center;margin-bottom:1rem;flex-wrap:wrap;font-size:0.9rem}
+.install-box{background:var(--card);border:1px solid var(--border);border-radius:8px;display:inline-block;padding:0.5rem 1rem;font-family:var(--font-mono);font-size:0.8rem;color:var(--muted);margin-top:0.5rem}
+.install-box span{color:var(--green)}
+.footer-copy{color:var(--muted);font-size:0.78rem;margin-top:1rem}
+
+/* Responsive */
+@media(max-width:600px){
+  .logo{font-size:2.5rem}
+  textarea{min-height:100px;font-size:0.78rem}
+  pre{font-size:0.75rem}
+  .section-body{padding:0.75rem}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="logo">jwx</div>
+    <p class="tagline">Decode JSON Web Tokens instantly in your browser</p>
+    <div class="badge-row">
+      <a href="https://github.com/manimovassagh/jwx/actions/workflows/ci.yml"><img src="https://github.com/manimovassagh/jwx/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+      <a href="https://github.com/manimovassagh/jwx/releases"><img src="https://img.shields.io/github/v/release/manimovassagh/jwx?include_prereleases" alt="Release"></a>
+      <a href="https://github.com/manimovassagh/jwx/blob/main/LICENSE"><img src="https://img.shields.io/github/license/manimovassagh/jwx" alt="License"></a>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="container">
+    <div class="input-section">
+      <label for="jwt-input">Paste a JWT</label>
+      <div class="input-wrap">
+        <textarea id="jwt-input" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c" spellcheck="false" autocomplete="off"></textarea>
+      </div>
+      <div class="btn-row">
+        <button class="btn-primary" onclick="decode()">Decode</button>
+        <button class="btn-secondary" onclick="clearAll()">Clear</button>
+      </div>
+    </div>
+
+    <div id="error" class="error-msg"></div>
+
+    <div id="status" class="status-bar"></div>
+
+    <div id="decoded" class="decoded">
+      <div class="section header-section">
+        <div class="section-header">
+          <span class="section-label"><span class="section-dot"></span>Header</span>
+          <button class="btn-copy" id="copy-header" onclick="copySection('header')">Copy</button>
+        </div>
+        <div class="section-body"><pre id="header-json"></pre></div>
+      </div>
+
+      <div class="section payload-section">
+        <div class="section-header">
+          <span class="section-label"><span class="section-dot"></span>Payload</span>
+          <button class="btn-copy" id="copy-payload" onclick="copySection('payload')">Copy</button>
+        </div>
+        <div class="section-body"><pre id="payload-json"></pre></div>
+      </div>
+
+      <div class="section signature-section">
+        <div class="section-header">
+          <span class="section-label"><span class="section-dot"></span>Signature</span>
+        </div>
+        <div class="section-body"><pre id="sig-json"></pre></div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="container">
+    <div class="footer-brand">jwx</div>
+    <div class="footer-links">
+      <a href="https://github.com/manimovassagh/jwx">GitHub</a>
+      <a href="https://github.com/manimovassagh/jwx/releases">Releases</a>
+      <a href="https://github.com/manimovassagh/jwx/issues">Issues</a>
+    </div>
+    <div class="install-box"><span>$</span> go install github.com/manimovassagh/jwx/cmd/jwx@latest</div>
+    <p class="footer-copy">Client-side only. Your tokens never leave your browser.</p>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var input = document.getElementById('jwt-input');
+  input.addEventListener('input', function(){ decode(); });
+  input.addEventListener('paste', function(){
+    setTimeout(decode, 10);
+  });
+})();
+
+function escHtml(s) {
+  var el = document.createElement('span');
+  el.textContent = s;
+  return el.innerHTML;
+}
+
+function base64urlDecode(str) {
+  str = str.replace(/-/g, '+').replace(/_/g, '/');
+  while (str.length % 4) str += '=';
+  return decodeURIComponent(atob(str).split('').map(function(c){
+    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+  }).join(''));
+}
+
+function decode() {
+  var raw = document.getElementById('jwt-input').value.trim();
+  var errEl = document.getElementById('error');
+  var decodedEl = document.getElementById('decoded');
+  var statusEl = document.getElementById('status');
+
+  errEl.className = 'error-msg';
+  errEl.textContent = '';
+  decodedEl.className = 'decoded';
+  statusEl.textContent = '';
+
+  if (!raw) return;
+
+  if (raw.toLowerCase().indexOf('bearer ') === 0) {
+    raw = raw.slice(7);
+  }
+
+  var parts = raw.split('.');
+  if (parts.length !== 3) {
+    showError('Invalid JWT: expected 3 parts separated by dots, got ' + parts.length);
+    return;
+  }
+
+  var header, payload;
+  try {
+    header = JSON.parse(base64urlDecode(parts[0]));
+  } catch(e) {
+    showError('Failed to decode header: ' + e.message);
+    return;
+  }
+  try {
+    payload = JSON.parse(base64urlDecode(parts[1]));
+  } catch(e) {
+    showError('Failed to decode payload: ' + e.message);
+    return;
+  }
+
+  window._jwxHeader = JSON.stringify(header, null, 2);
+  window._jwxPayload = JSON.stringify(payload, null, 2);
+
+  // Build status badges using DOM
+  statusEl.textContent = '';
+  if (header.alg) {
+    var algBadge = document.createElement('span');
+    algBadge.className = 'alg-badge';
+    algBadge.textContent = header.alg;
+    statusEl.appendChild(algBadge);
+  }
+  if (typeof payload.exp === 'number') {
+    var now = Math.floor(Date.now() / 1000);
+    var expiryBadge = document.createElement('span');
+    if (payload.exp > now) {
+      expiryBadge.className = 'expiry-badge valid';
+      expiryBadge.textContent = 'Valid';
+    } else {
+      expiryBadge.className = 'expiry-badge expired';
+      expiryBadge.textContent = 'Expired';
+    }
+    statusEl.appendChild(expiryBadge);
+  }
+
+  // Render sections using safe DOM methods
+  renderJson(document.getElementById('header-json'), header, false);
+  renderJson(document.getElementById('payload-json'), payload, true);
+
+  var sigPre = document.getElementById('sig-json');
+  sigPre.textContent = '';
+  var sigSpan = document.createElement('span');
+  sigSpan.className = 'json-string';
+  sigSpan.textContent = parts[2];
+  sigPre.appendChild(sigSpan);
+
+  decodedEl.className = 'decoded show';
+}
+
+function renderJson(container, obj, detectTimestamps) {
+  container.textContent = '';
+  var json = JSON.stringify(obj, null, 2);
+  var lines = json.split('\n');
+
+  for (var i = 0; i < lines.length; i++) {
+    if (i > 0) container.appendChild(document.createTextNode('\n'));
+    appendHighlightedLine(container, lines[i]);
+
+    if (detectTimestamps) {
+      var tsMatch = lines[i].match(/"(exp|iat|nbf|auth_time)"\s*:\s*(\d+)/);
+      if (tsMatch) {
+        container.appendChild(document.createTextNode('\n'));
+        var tsSpan = document.createElement('span');
+        tsSpan.className = 'json-ts';
+        tsSpan.textContent = '    ' + formatTimestamp(tsMatch[1], parseInt(tsMatch[2], 10));
+        container.appendChild(tsSpan);
+      }
+    }
+  }
+}
+
+function appendHighlightedLine(container, line) {
+  // Tokenize JSON line and append colored spans
+  var remaining = line;
+
+  // Match key-value patterns
+  var kvRegex = /^(\s*)"([^"]+)"\s*:\s*(.*)/;
+  var kvMatch = remaining.match(kvRegex);
+
+  if (kvMatch) {
+    var indent = kvMatch[1];
+    var key = kvMatch[2];
+    var valPart = kvMatch[3];
+
+    container.appendChild(document.createTextNode(indent));
+
+    var keySpan = document.createElement('span');
+    keySpan.className = 'json-key';
+    keySpan.textContent = '"' + key + '"';
+    container.appendChild(keySpan);
+
+    container.appendChild(document.createTextNode(': '));
+
+    appendValue(container, valPart);
+    return;
+  }
+
+  // Standalone value lines (arrays, closing braces, etc.)
+  var standaloneStr = remaining.match(/^(\s*)"([^"]*)"(,?)$/);
+  if (standaloneStr) {
+    container.appendChild(document.createTextNode(standaloneStr[1]));
+    var strSpan = document.createElement('span');
+    strSpan.className = 'json-string';
+    strSpan.textContent = '"' + standaloneStr[2] + '"';
+    container.appendChild(strSpan);
+    if (standaloneStr[3]) container.appendChild(document.createTextNode(standaloneStr[3]));
+    return;
+  }
+
+  container.appendChild(document.createTextNode(line));
+}
+
+function appendValue(container, valStr) {
+  valStr = valStr.trim();
+  var trailing = '';
+  if (valStr.endsWith(',')) {
+    trailing = ',';
+    valStr = valStr.slice(0, -1);
+  }
+
+  var span = document.createElement('span');
+
+  if (valStr.charAt(0) === '"' && valStr.charAt(valStr.length - 1) === '"') {
+    span.className = 'json-string';
+    span.textContent = valStr;
+  } else if (/^-?\d+\.?\d*$/.test(valStr)) {
+    span.className = 'json-number';
+    span.textContent = valStr;
+  } else if (valStr === 'true' || valStr === 'false' || valStr === 'null') {
+    span.className = 'json-bool';
+    span.textContent = valStr;
+  } else {
+    // Object/array start, etc.
+    span = null;
+    container.appendChild(document.createTextNode(valStr));
+  }
+
+  if (span) container.appendChild(span);
+  if (trailing) container.appendChild(document.createTextNode(trailing));
+}
+
+function showError(msg) {
+  var el = document.getElementById('error');
+  el.textContent = msg;
+  el.className = 'error-msg show';
+}
+
+function clearAll() {
+  document.getElementById('jwt-input').value = '';
+  document.getElementById('error').className = 'error-msg';
+  document.getElementById('error').textContent = '';
+  document.getElementById('decoded').className = 'decoded';
+  document.getElementById('status').textContent = '';
+}
+
+function formatTimestamp(key, ts) {
+  var date = new Date(ts * 1000);
+  var dateStr = date.toISOString().replace('T', ' ').replace(/\.\d+Z$/, ' UTC');
+  var now = Math.floor(Date.now() / 1000);
+  var diff = ts - now;
+  var rel = '';
+
+  if (key === 'exp') {
+    if (diff > 0) {
+      rel = '  \u2713 Expires ' + relativeTime(diff);
+    } else {
+      rel = '  \u26a0 EXPIRED ' + relativeTime(-diff) + ' ago';
+    }
+  } else if (key === 'nbf') {
+    if (diff > 0) {
+      rel = '  \u26a0 Not valid for another ' + relativeTime(diff);
+    } else {
+      rel = '  \u2713 Active since ' + relativeTime(-diff) + ' ago';
+    }
+  } else if (key === 'iat' || key === 'auth_time') {
+    if (diff <= 0) {
+      rel = '  ' + relativeTime(-diff) + ' ago';
+    } else {
+      rel = '  in ' + relativeTime(diff);
+    }
+  }
+  return dateStr + rel;
+}
+
+function relativeTime(sec) {
+  if (sec < 60) return sec + 's';
+  var min = Math.floor(sec / 60);
+  if (min < 60) return min + ' minute' + (min === 1 ? '' : 's');
+  var hrs = Math.floor(min / 60);
+  if (hrs < 24) return hrs + ' hour' + (hrs === 1 ? '' : 's');
+  var days = Math.floor(hrs / 24);
+  if (days < 30) return days + ' day' + (days === 1 ? '' : 's');
+  if (days < 365) {
+    var months = Math.floor(days / 30);
+    return months + ' month' + (months === 1 ? '' : 's');
+  }
+  var years = Math.floor(days / 365);
+  return years + ' year' + (years === 1 ? '' : 's');
+}
+
+function copySection(which) {
+  var text = which === 'header' ? window._jwxHeader : window._jwxPayload;
+  if (!text) return;
+  var btnId = which === 'header' ? 'copy-header' : 'copy-payload';
+  var btn = document.getElementById(btnId);
+  navigator.clipboard.writeText(text).then(function(){
+    if (btn) {
+      var orig = btn.textContent;
+      btn.textContent = 'Copied!';
+      setTimeout(function(){ btn.textContent = orig; }, 1200);
+    }
+  });
+}
+</script>
+
+</body>
+</html>

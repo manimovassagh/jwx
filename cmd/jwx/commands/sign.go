@@ -44,15 +44,16 @@ func init() {
 func runSign(cmd *cobra.Command, args []string) error {
 	var claims string
 
-	if signFrom != "" {
+	switch {
+	case signFrom != "":
 		data, err := os.ReadFile(signFrom)
 		if err != nil {
 			return fmt.Errorf("failed to read claims file: %w", err)
 		}
 		claims = string(data)
-	} else if len(args) > 0 {
+	case len(args) > 0:
 		claims = args[0]
-	} else {
+	default:
 		return fmt.Errorf("no claims provided\n\nUsage: jwx sign --alg HS256 --secret mykey '{\"sub\":\"1234\"}'")
 	}
 

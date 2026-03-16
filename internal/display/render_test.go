@@ -246,6 +246,30 @@ func TestRender_ShortSignatureNotTruncated(t *testing.T) {
 	}
 }
 
+func TestRender_NoColor(t *testing.T) {
+	// Enable NoColor mode
+	NoColor = true
+	defer func() {
+		NoColor = false
+		initStyles()
+	}()
+
+	token := makeBasicToken()
+	output := Render(token)
+
+	// ANSI escape codes start with ESC (\x1b)
+	if strings.Contains(output, "\x1b[") {
+		t.Errorf("NoColor output should not contain ANSI escape codes, got:\n%s", output)
+	}
+
+	// Content should still be present
+	for _, want := range []string{"Header", "Payload", "Signature", "HS256"} {
+		if !strings.Contains(output, want) {
+			t.Errorf("NoColor output missing %q", want)
+		}
+	}
+}
+
 func TestRender_UnknownAlgorithm(t *testing.T) {
 	token := &jwt.DecodedToken{
 		Header:    map[string]interface{}{},

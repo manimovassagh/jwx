@@ -1,0 +1,39 @@
+# golangci-lint configuration
+version: "2"
+
+run:
+  timeout: 2m
+
+formatters:
+  enable:
+    - gofmt
+    - goimports
+  settings:
+    goimports:
+      local-prefixes: github.com/manimovassagh/jwx
+
+linters:
+  enable:
+    - errcheck
+    - govet
+    - ineffassign
+    - staticcheck
+    - unused
+    - misspell
+    - gocritic
+    - unconvert
+
+  settings:
+    misspell:
+      locale: US
+    gocritic:
+      enabled-tags:
+        - diagnostic
+        - style
+        - performance
+
+issues:
+  exclude-rules:
+    - path: _test\.go
+      linters:
+        - gocritic

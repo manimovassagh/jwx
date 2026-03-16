@@ -6,10 +6,7 @@ builds:
   - main: ./cmd/jwx
     binary: jwx
     ldflags:
-      - -s -w
-      - -X main.version={{.Version}}
-      - -X main.commit={{.Commit}}
-      - -X main.date={{.Date}}
+      - -s -w -X main.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{.Date}}
     goos:
       - linux
       - darwin
@@ -19,14 +16,20 @@ builds:
       - arm64
 
 archives:
-  - format: tar.gz
-    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+  - formats:
+      - tar.gz
+    name_template: "jwx_{{.Version}}_{{.Os}}_{{.Arch}}"
     format_overrides:
       - goos: windows
-        format: zip
+        formats:
+          - zip
 
-brews:
-  - # TODO: Update with your Homebrew tap repository
+checksum:
+  name_template: "checksums.txt"
+  algorithm: sha256
+
+homebrew_casks:
+  - name: jwx
     repository:
       owner: manimovassagh
       name: homebrew-tap
@@ -43,3 +46,6 @@ changelog:
       - "^test:"
       - "^ci:"
       - "^chore:"
+
+snapshot:
+  version_template: "{{.Tag}}-next"

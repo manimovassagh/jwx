@@ -48,6 +48,22 @@ brew install manimovassagh/tap/jwx
 # Or download a binary from Releases
 ```
 
+## Shell Completions
+
+```bash
+# Bash
+jwx completion bash > /etc/bash_completion.d/jwx
+
+# Zsh
+jwx completion zsh > "${fpath[1]}/_jwx"
+
+# Fish
+jwx completion fish > ~/.config/fish/completions/jwx.fish
+
+# PowerShell
+jwx completion powershell | Out-String | Invoke-Expression
+```
+
 ## Quick Start
 
 ```bash

@@ -38,14 +38,37 @@ brews:
   - repository:
       owner: manimovassagh
       name: homebrew-tap
+      token: "{{ .Env.HOMEBREW_TAP_TOKEN }}"
     homepage: "https://github.com/manimovassagh/jwx"
     description: "A beautiful CLI for working with JSON Web Tokens"
     license: "MIT"
-    skip_upload: true
     install: |
       bin.install "jwx"
     test: |
       system bin/"jwx", "version"
+
+nfpms:
+  - id: jwx
+    package_name: jwx
+    homepage: "https://github.com/manimovassagh/jwx"
+    description: "A beautiful CLI for working with JSON Web Tokens"
+    maintainer: "Mani Movassagh <mani@jwx.dev>"
+    license: "MIT"
+    formats:
+      - deb
+      - rpm
+      - apk
+
+chocolateys:
+  - name: jwx
+    title: "jwx - JWT CLI Tool"
+    authors: "Mani Movassagh"
+    project_url: "https://github.com/manimovassagh/jwx"
+    copyright: "2026 Mani Movassagh"
+    license_url: "https://github.com/manimovassagh/jwx/blob/main/LICENSE"
+    description: "A beautiful CLI for working with JSON Web Tokens"
+    tags: "jwt json-web-token cli security developer-tools"
+    skip_publish: true
 
 changelog:
   sort: asc

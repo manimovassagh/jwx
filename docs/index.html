@@ -291,6 +291,50 @@ pre{font-family:var(--mono);font-size:.85rem;line-height:1.65;white-space:pre-wr
   background:linear-gradient(90deg,var(--ts-bg),transparent);
 }
 
+/* ─── Verify Signature section ─── */
+.verify-section{
+  background:var(--dec-surface);border:1px solid var(--dec-border);
+  border-radius:8px;margin-bottom:.6rem;overflow:hidden;border-left:3px solid var(--gold);
+}
+.verify-section:hover{box-shadow:0 2px 12px rgba(0,0,0,.04)}
+.verify-toggle{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:.35rem .8rem;border:none;background:var(--section-header-bg);
+  width:100%;cursor:pointer;border-bottom:1px solid transparent;color:var(--dec-text);
+  font-family:var(--font);
+}
+.verify-toggle[aria-expanded="true"]{border-bottom-color:var(--dec-border)}
+.verify-toggle-left{display:flex;align-items:center;gap:.5rem;font-size:.85rem;font-weight:700}
+.verify-chevron{font-size:.7rem;color:var(--dec-muted)}
+.verify-toggle[aria-expanded="true"] .verify-chevron{transform:rotate(90deg)}
+.verify-body{display:none;padding:.6rem .9rem}
+.verify-body.open{display:block}
+.verify-algo-hint{font-size:.75rem;color:var(--dec-muted);margin-bottom:.5rem;font-family:var(--mono)}
+.verify-input{
+  width:100%;background:var(--input-bg);border:1px solid var(--border);
+  border-radius:8px;color:var(--input-text);font-family:var(--mono);font-size:.85rem;
+  padding:.6rem .8rem;resize:vertical;outline:none;
+}
+.verify-input:focus{border-color:rgba(109,93,252,.4);box-shadow:0 0 0 3px rgba(109,93,252,.1)}
+.verify-input::placeholder{color:var(--input-placeholder)}
+.verify-actions{display:flex;align-items:center;gap:.75rem;margin-top:.5rem}
+.verify-btn{
+  cursor:pointer;background:var(--gold);color:#000;border:none;
+  border-radius:8px;font-family:var(--font);font-size:.82rem;font-weight:600;
+  padding:.45rem 1.1rem;
+}
+.verify-btn:hover{opacity:.9}
+.verify-btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.verify-result{font-size:.82rem;font-weight:600;display:flex;align-items:center;gap:.35rem}
+.verify-result.valid{color:var(--green)}
+.verify-result.invalid{color:var(--red)}
+.verify-privacy{font-size:.68rem;color:var(--dec-muted);margin-top:.45rem;display:flex;align-items:center;gap:.35rem}
+.verify-privacy .privacy-dot{width:5px;height:5px}
+@media (prefers-reduced-motion: no-preference) {
+  .verify-chevron{transition:transform .2s}
+  .verify-btn{transition:opacity .15s}
+}
+
 /* Empty / error state */
 .empty-state{
   display:flex;flex-direction:column;align-items:center;justify-content:center;
@@ -550,6 +594,9 @@ function decode(){
   sigPre.appendChild(sigSpan);sigBody.appendChild(sigPre);
   sigSec.appendChild(sigTop);sigSec.appendChild(sigBody);
   out.appendChild(sigSec);
+
+  // Verify Signature section
+  out.appendChild(makeVerifySection(header.alg||'',raw));
 }
 
 function makeSection(name,cls,dotCls,obj,timestamps){
@@ -676,6 +723,135 @@ function toggleTheme(){
     }
   }catch(e){}
 })();
+
+/* ─── Signature Verification (Issue #2) ─── */
+function makeVerifySection(alg,rawToken){
+  var sec=document.createElement('div');sec.className='verify-section';
+  var toggle=document.createElement('button');toggle.className='verify-toggle';
+  toggle.setAttribute('aria-expanded','false');
+  var left=document.createElement('span');left.className='verify-toggle-left';
+  var dot=document.createElement('span');dot.className='sec-dot gold';
+  var chevron=document.createElement('span');chevron.className='verify-chevron';chevron.textContent='\u25B6';
+  left.appendChild(dot);left.appendChild(document.createTextNode('Verify Signature'));
+  toggle.appendChild(left);toggle.appendChild(chevron);
+  sec.appendChild(toggle);
+
+  var body=document.createElement('div');body.className='verify-body';
+
+  var isHmac=/^HS(256|384|512)$/.test(alg);
+  var isRsa=/^RS(256|384|512)$/.test(alg);
+  var isEc=/^ES(256|384|512)$/.test(alg);
+  var supported=isHmac||isRsa||isEc;
+
+  var hint=document.createElement('div');hint.className='verify-algo-hint';
+  if(!supported){hint.textContent='Algorithm '+alg+' is not supported for verification';body.appendChild(hint);sec.appendChild(body);toggle.addEventListener('click',function(){var exp=toggle.getAttribute('aria-expanded')==='true';toggle.setAttribute('aria-expanded',exp?'false':'true');body.classList.toggle('open')});return sec}
+  hint.textContent=alg+' — '+(isHmac?'Enter shared secret':'Paste public key (PEM, SPKI format)');
+  body.appendChild(hint);
+
+  var input;
+  if(isHmac){
+    input=document.createElement('input');input.type='text';input.className='verify-input';
+    input.placeholder='Enter HMAC secret...';input.setAttribute('aria-label','HMAC shared secret');
+  } else {
+    input=document.createElement('textarea');input.className='verify-input';input.rows=4;
+    input.placeholder='-----BEGIN PUBLIC KEY-----\n...\n-----END PUBLIC KEY-----';
+    input.setAttribute('aria-label','Public key in PEM format');
+  }
+  body.appendChild(input);
+
+  var actions=document.createElement('div');actions.className='verify-actions';
+  var btn=document.createElement('button');btn.className='verify-btn';btn.textContent='Verify';
+  var result=document.createElement('span');result.className='verify-result';
+  actions.appendChild(btn);actions.appendChild(result);
+  body.appendChild(actions);
+
+  var privacy=document.createElement('div');privacy.className='verify-privacy';
+  var pDot=document.createElement('span');pDot.className='privacy-dot';
+  privacy.appendChild(pDot);privacy.appendChild(document.createTextNode('Verification happens locally \u2014 your key never leaves this page'));
+  body.appendChild(privacy);
+  sec.appendChild(body);
+
+  toggle.addEventListener('click',function(){
+    var exp=toggle.getAttribute('aria-expanded')==='true';
+    toggle.setAttribute('aria-expanded',exp?'false':'true');
+    body.classList.toggle('open');
+  });
+
+  btn.addEventListener('click',function(){
+    result.className='verify-result';result.textContent='Verifying...';
+    var keyVal=input.value;
+    if(!keyVal.trim()){result.className='verify-result invalid';result.textContent='\u2717 Please enter a '+(isHmac?'secret':'public key');return}
+    verifyJwt(alg,rawToken,keyVal).then(function(valid){
+      if(valid){result.className='verify-result valid';result.textContent='\u2713 Signature is valid'}
+      else{result.className='verify-result invalid';result.textContent='\u2717 Invalid signature'}
+    }).catch(function(err){
+      result.className='verify-result invalid';result.textContent='\u2717 Error: '+(err.message||'Verification failed');
+    });
+  });
+
+  return sec;
+}
+
+function b64UrlDecode(s){
+  s=s.replace(/-/g,'+').replace(/_/g,'/');
+  while(s.length%4)s+='=';
+  var bin=atob(s),arr=new Uint8Array(bin.length);
+  for(var i=0;i<bin.length;i++)arr[i]=bin.charCodeAt(i);
+  return arr;
+}
+
+function pemToArrayBuffer(pem){
+  var lines=pem.trim().split('\n');
+  var b64='';
+  for(var i=0;i<lines.length;i++){
+    var line=lines[i].trim();
+    if(line.indexOf('-----')===0)continue;
+    b64+=line;
+  }
+  var bin=atob(b64),arr=new Uint8Array(bin.length);
+  for(var i=0;i<bin.length;i++)arr[i]=bin.charCodeAt(i);
+  return arr.buffer;
+}
+
+function getAlgoParams(alg){
+  var hash={'256':'SHA-256','384':'SHA-384','512':'SHA-512'}[alg.slice(2)];
+  if(alg.indexOf('HS')===0)return{import:{name:'HMAC',hash:hash},sign:{name:'HMAC'}};
+  if(alg.indexOf('RS')===0)return{import:{name:'RSASSA-PKCS1-v1_5',hash:hash},verify:{name:'RSASSA-PKCS1-v1_5'}};
+  if(alg.indexOf('ES')===0){
+    var namedCurve={'256':'P-256','384':'P-384','512':'P-521'}[alg.slice(2)];
+    return{import:{name:'ECDSA',namedCurve:namedCurve},verify:{name:'ECDSA',hash:hash}};
+  }
+  return null;
+}
+
+function verifyJwt(alg,rawToken,keyVal){
+  var parts=rawToken.split('.');
+  var signInput=parts[0]+'.'+parts[1];
+  var signatureBytes=b64UrlDecode(parts[2]);
+  var enc=new TextEncoder();
+  var data=enc.encode(signInput);
+  var params=getAlgoParams(alg);
+  if(!params)return Promise.reject(new Error('Unsupported algorithm'));
+
+  if(alg.indexOf('HS')===0){
+    var keyBytes=enc.encode(keyVal);
+    return crypto.subtle.importKey('raw',keyBytes,params.import,false,['sign']).then(function(key){
+      return crypto.subtle.sign(params.sign,key,data);
+    }).then(function(sig){
+      var expected=new Uint8Array(sig);
+      if(expected.length!==signatureBytes.length)return false;
+      var match=true;
+      for(var i=0;i<expected.length;i++){if(expected[i]!==signatureBytes[i])match=false}
+      return match;
+    });
+  }
+
+  // RSA or ECDSA — import PEM public key
+  var keyBuffer=pemToArrayBuffer(keyVal);
+  return crypto.subtle.importKey('spki',keyBuffer,params.import,false,['verify']).then(function(key){
+    return crypto.subtle.verify(params.verify,key,signatureBytes,data);
+  });
+}
 
 function copyInstall(btn){
   try{

@@ -57,10 +57,10 @@ jobs:
           FORMULA_EOF
 
           git clone "https://x-access-token:${HOMEBREW_TAP_TOKEN}@github.com/manimovassagh/homebrew-tap.git" tap
-          cp /tmp/jwx.rb tap/Formula/jwx.rb
+          cp /tmp/jwx.rb tap/jwx.rb
           cd tap
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add Formula/jwx.rb
+          git add jwx.rb
           git diff --cached --quiet || git commit -m "jwx ${TAG}"
           git push

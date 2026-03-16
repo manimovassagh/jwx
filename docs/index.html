@@ -928,6 +928,77 @@ function copyInstall(btn){
     }, 1500);
   });
 }
+
+/* ─── Init ─── */
+(function(){
+  /* Floating dots */
+  var dotsContainer = document.getElementById('dots');
+  for(var i = 0; i < 30; i++){
+    var dot = document.createElement('div');
+    dot.className = 'dot';
+    dot.style.left = Math.random() * 100 + '%';
+    dot.style.top = (80 + Math.random() * 40) + '%';
+    dot.style.animationDuration = (8 + Math.random() * 12) + 's';
+    dot.style.animationDelay = Math.random() * 10 + 's';
+    dot.style.width = (1 + Math.random() * 2) + 'px';
+    dot.style.height = dot.style.width;
+    dotsContainer.appendChild(dot);
+  }
+
+  /* Intersection Observer for reveal animations */
+  var reveals = document.querySelectorAll('.reveal');
+  if('IntersectionObserver' in window){
+    var observer = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if(entry.isIntersecting){
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    },{threshold:0.1,rootMargin:'0px 0px -40px 0px'});
+    reveals.forEach(function(el){ observer.observe(el); });
+  } else {
+    reveals.forEach(function(el){ el.classList.add('visible'); });
+  }
+
+  /* Feature card mouse tracking for radial glow */
+  document.querySelectorAll('.feature-card').forEach(function(card){
+    card.addEventListener('mousemove', function(e){
+      var rect = card.getBoundingClientRect();
+      card.style.setProperty('--mouse-x', (e.clientX - rect.left) + 'px');
+      card.style.setProperty('--mouse-y', (e.clientY - rect.top) + 'px');
+    });
+  });
+
+  /* Auto-decode on input */
+  var input = document.getElementById('jwt-input');
+  input.addEventListener('input', function(){ decode(); });
+  input.addEventListener('paste', function(){ setTimeout(decode, 10); });
+
+  /* Build sample pills dynamically */
+  var pillContainer = document.getElementById('sample-pills');
+  var sampleKeys = ['basic','rich','expired','admin','oauth'];
+  var dotColors = ['blue','purple','red','green','cyan'];
+  sampleKeys.forEach(function(key, idx){
+    var btn = document.createElement('button');
+    btn.className = 'pill';
+    btn.setAttribute('data-sample', key);
+
+    var dotEl = document.createElement('span');
+    dotEl.className = 'pill-dot ' + dotColors[idx];
+    btn.appendChild(dotEl);
+
+    var label = document.createTextNode(SAMPLES[key].label);
+    btn.appendChild(label);
+
+    btn.addEventListener('click', function(){
+      document.querySelectorAll('.pill').forEach(function(p){ p.classList.remove('active'); });
+      btn.classList.add('active');
+      loadSample(key);
+    });
+    pillContainer.appendChild(btn);
+  });
+})();
 </script>
 
 </body>

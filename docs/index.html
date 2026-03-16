@@ -13,7 +13,7 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#x1f511;</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -102,6 +102,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow:hid
   padding:.4rem 1.2rem;background:var(--surface);border-bottom:1px solid var(--border);
   flex-shrink:0;z-index:10;
 }
+.header-left{display:flex;align-items:center;gap:.75rem}
+.header-subtitle{color:var(--muted);font-size:.7rem;font-weight:500}
 .logo{
   font-family:var(--mono);font-weight:500;font-size:1.6rem;
   background:linear-gradient(135deg,var(--accent),var(--accent-2));
@@ -122,6 +124,12 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow:hid
 .badge-row a:hover img{opacity:1}
 .privacy-dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);animation:pulse 3s infinite}
 @keyframes pulse{0%,100%{opacity:.5}50%{opacity:1}}
+.footer-privacy{display:flex;align-items:center;gap:.4rem}
+
+/* ─── Focus-visible styles ─── */
+.pill:focus-visible,.copy-btn:focus-visible,.theme-toggle:focus-visible,.footer-install:focus-visible{
+  outline:2px solid var(--accent);outline-offset:2px;
+}
 
 /* ─── MAIN SPLIT ─── */
 .main{display:grid;grid-template-columns:1fr 1fr;flex:1;overflow:hidden}
@@ -147,6 +155,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow:hid
   box-shadow:0 0 0 3px rgba(109,93,252,.1),0 0 30px rgba(109,93,252,.05);
 }
 .encoded-area::placeholder{color:var(--input-placeholder)}
+.encoded-area.flash{border-color:var(--accent)!important;box-shadow:0 0 0 3px rgba(109,93,252,.25)!important}
 .pill-row{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.75rem}
 .pill{
   cursor:pointer;background:var(--surface-2);border:1px solid var(--border);
@@ -155,7 +164,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow:hid
   display:flex;align-items:center;gap:.35rem;
 }
 .pill:hover{border-color:rgba(109,93,252,.4);color:var(--text);background:rgba(109,93,252,.08)}
-.pill.active{border-color:var(--accent);color:#c4b5fd;background:rgba(109,93,252,.12)}
+.pill.active{border-color:var(--accent);color:var(--alg-color);background:var(--alg-bg)}
 .pill-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
 
 /* ─── RIGHT: DECODED ─── */
@@ -182,12 +191,12 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow:hid
 .exp-badge.valid{background:var(--green-bg);color:var(--green);border:1px solid rgba(34,197,94,.2)}
 .exp-badge.expired{background:var(--red-bg);color:var(--red);border:1px solid rgba(239,68,68,.2)}
 
-.decoded-body{padding:.5rem 1rem .5rem;flex:1}
+.decoded-body{padding:.75rem 1.2rem;flex:1}
 
 /* Section cards */
 .section{
   background:var(--dec-surface);border:1px solid var(--dec-border);
-  border-radius:8px;margin-bottom:.4rem;overflow:hidden;
+  border-radius:8px;margin-bottom:.6rem;overflow:hidden;
   transition:box-shadow .2s;
 }
 .section:hover{box-shadow:0 2px 12px rgba(0,0,0,.04)}
@@ -213,7 +222,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);overflow:hid
 .copy-btn:hover{border-color:#a1a1aa;color:var(--dec-text)}
 .copy-btn.done{border-color:var(--green);color:var(--green)}
 
-.section-content{padding:.4rem .8rem;overflow-x:auto}
+.section-content{padding:.5rem .9rem;overflow-x:auto}
 pre{font-family:var(--mono);font-size:.85rem;line-height:1.65;white-space:pre-wrap;word-break:break-all;color:var(--dec-text)}
 .json-key{color:var(--key);font-weight:500}
 .json-str{color:var(--str)}
@@ -263,6 +272,7 @@ pre{font-family:var(--mono);font-size:.85rem;line-height:1.65;white-space:pre-wr
   .badge-row{display:none}
   .panel-left,.panel-right{overflow:visible}
   .panel-left{border-right:none;border-bottom:1px solid var(--border)}
+  .encoded-area{font-size:16px}
 }
 </style>
 </head>
@@ -271,28 +281,28 @@ pre{font-family:var(--mono);font-size:.85rem;line-height:1.65;white-space:pre-wr
 
   <!-- HEADER -->
   <header class="header">
-    <div style="display:flex;align-items:center;gap:.75rem">
+    <div class="header-left">
       <span class="logo">jwx</span>
-      <span style="color:var(--muted);font-size:.7rem;font-weight:500">JWT Decoder</span>
+      <span class="header-subtitle">Privacy-first JWT Decoder</span>
     </div>
     <div class="header-right">
       <div class="badge-row">
         <a href="https://github.com/manimovassagh/jwx/actions/workflows/ci.yml"><img src="https://github.com/manimovassagh/jwx/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
         <a href="https://github.com/manimovassagh/jwx/releases"><img src="https://img.shields.io/github/v/release/manimovassagh/jwx?style=flat-square&color=6d5dfc" alt="Release"></a>
       </div>
-      <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme" id="theme-btn">☀️</button>
-      <span class="privacy-dot" title="Client-side only"></span>
+      <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme" id="theme-btn" aria-label="Toggle dark and light theme">☀️</button>
+      <span class="privacy-dot" title="Client-side only" role="img" aria-label="Client-side only"></span>
       <a href="https://github.com/manimovassagh/jwx">GitHub ↗</a>
     </div>
   </header>
 
   <!-- SPLIT PANES -->
-  <div class="main">
+  <main class="main">
 
     <!-- LEFT: Encoded JWT (dark) -->
     <div class="panel-left">
-      <div class="panel-label"><span>Encoded</span> — paste or pick a sample</div>
-      <textarea class="encoded-area" id="input" spellcheck="false" autocomplete="off" placeholder="Paste a JWT here..."></textarea>
+      <label for="input" class="panel-label"><span>Encoded</span> — paste or pick a sample</label>
+      <textarea class="encoded-area" id="input" spellcheck="false" autocomplete="off" placeholder="Paste a JWT here..." aria-label="Encoded JWT input"></textarea>
       <div class="pill-row" id="pills"></div>
     </div>
 
@@ -302,14 +312,14 @@ pre{font-family:var(--mono);font-size:.85rem;line-height:1.65;white-space:pre-wr
         <span class="decoded-label">Decoded</span>
         <div class="status-badges" id="badges"></div>
       </div>
-      <div class="decoded-body" id="output">
+      <div class="decoded-body" id="output" aria-live="polite" aria-label="Decoded JWT output">
         <div class="empty-state" id="empty">
           <div class="empty-icon">🔑</div>
           <div class="empty-text">Paste a JWT on the left<br>or pick a sample below</div>
         </div>
       </div>
     </div>
-  </div>
+  </main>
 
   <!-- FOOTER -->
   <footer class="footer">
@@ -319,7 +329,7 @@ pre{font-family:var(--mono);font-size:.85rem;line-height:1.65;white-space:pre-wr
       <a href="https://github.com/manimovassagh/jwx/issues">Issues</a>
     </div>
     <button class="footer-install" onclick="copyInstall(this)" title="Click to copy">$ go install github.com/manimovassagh/jwx/cmd/jwx@latest</button>
-    <div style="display:flex;align-items:center;gap:.4rem">
+    <div class="footer-privacy">
       <span class="privacy-dot"></span>
       <span>⚠️ Warning: JWTs are credentials — do not paste tokens containing real secrets or production data. This tool runs client-side only, but treat tokens with care.</span>
     </div>
@@ -351,10 +361,19 @@ var _h,_p,_s;
   // Auto-decode
   var inp=document.getElementById('input');
   inp.addEventListener('input',decode);
-  inp.addEventListener('paste',function(){setTimeout(decode,10)});
+  inp.addEventListener('paste',function(){
+    inp.classList.add('flash');
+    setTimeout(function(){inp.classList.remove('flash')},300);
+    setTimeout(decode,10);
+  });
 
-  // Load default token
-  pick('rich');
+  // Load from hash or default token
+  if(location.hash.length>10){
+    inp.value=decodeURIComponent(location.hash.slice(1));
+    decode();
+  } else {
+    pick('rich');
+  }
 })();
 
 function pick(k){
@@ -380,14 +399,21 @@ function decode(){
   if(empty)empty.style.display='none';
 
   if(raw.toLowerCase().indexOf('bearer ')===0)raw=raw.slice(7);
+  raw=raw.replace(/\s+/g,'');
+
+  if(raw.length>100000){showErr(out,'Token too large. Maximum 100KB.');return}
+
   var parts=raw.split('.');
   if(parts.length!==3){showErr(out,'Invalid JWT: expected 3 parts, got '+parts.length);return}
 
   var header,payload;
-  try{header=JSON.parse(b64(parts[0]))}catch(e){showErr(out,'Bad header: '+e.message);return}
-  try{payload=JSON.parse(b64(parts[1]))}catch(e){showErr(out,'Bad payload: '+e.message);return}
+  try{header=JSON.parse(b64(parts[0]))}catch(e){showErr(out,'Could not decode header. Check that this is a valid JWT.');return}
+  try{payload=JSON.parse(b64(parts[1]))}catch(e){showErr(out,'Could not decode payload. The token may be corrupted.');return}
 
   _h=JSON.stringify(header,null,2);_p=JSON.stringify(payload,null,2);_s=parts[2];
+
+  // Update URL hash
+  try{history.replaceState(null,'','#'+raw)}catch(e){}
 
   // Badges
   if(header.alg){var ab=document.createElement('span');ab.className='alg-badge';ab.textContent=header.alg;badges.appendChild(ab)}

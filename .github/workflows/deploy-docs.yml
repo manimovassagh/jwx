@@ -5,18 +5,25 @@ on:
     branches: [main]
     paths:
       - 'website/**'
+      - 'docs/**'
       - '.github/workflows/deploy-docs.yml'
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
-  build-and-deploy:
-    name: Build and Deploy Docusaurus
+  build:
+    name: Build
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -27,22 +34,41 @@ jobs:
         with:
           node-version: 20
 
-      - name: Install dependencies
+      - name: Install Docusaurus dependencies
         working-directory: website
         run: npm install
 
-      - name: Build site
+      - name: Build Docusaurus
         working-directory: website
         run: npm run build
         env:
           NODE_ENV: production
 
-      - name: Deploy to docs/docs directory
+      - name: Combine web decoder + docs into single site
         run: |
-          rm -rf docs/docs
-          cp -r website/build docs/docs
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add docs/docs
-          git diff --cached --quiet || git commit -m "docs: update Docusaurus build"
-          git push
+          mkdir -p _site
+          # Copy web decoder (index.html, assets, sitemap)
+          cp docs/index.html _site/
+          cp docs/sitemap.xml _site/ 2>/dev/null || true
+          cp -r docs/assets _site/assets 2>/dev/null || true
+          # Copy Docusaurus build into /docs/ subdirectory
+          cp -r website/build _site/docs
+          # Prevent Jekyll processing
+          touch _site/.nojekyll
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

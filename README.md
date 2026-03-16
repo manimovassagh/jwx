@@ -6,9 +6,15 @@
     <a href="https://goreportcard.com/report/github.com/manimovassagh/jwx"><img src="https://goreportcard.com/badge/github.com/manimovassagh/jwx" alt="Go Report Card"></a>
     <a href="https://github.com/manimovassagh/jwx/releases"><img src="https://img.shields.io/github/v/release/manimovassagh/jwx?include_prereleases" alt="Release"></a>
     <a href="LICENSE"><img src="https://img.shields.io/github/license/manimovassagh/jwx" alt="License"></a>
-    <a href="https://manimovassagh.github.io/jwx/"><img src="https://img.shields.io/badge/try_in_browser-blue?style=for-the-badge" alt="Try in browser"></a>
   </p>
 </p>
+
+<p align="center">
+  <a href="https://manimovassagh.github.io/jwx/">
+    <img src="https://img.shields.io/badge/%F0%9F%94%91_Try_it_in_your_browser-6d5dfc?style=for-the-badge&logoColor=white&labelColor=0c0c0f" alt="Try jwx in your browser" height="48">
+  </a>
+</p>
+<p align="center"><sub>No install needed — decode JWTs instantly, 100% client-side</sub></p>
 
 <p align="center">
   <img src="docs/assets/jwx-demo.gif" alt="jwx demo" width="800">
@@ -41,12 +47,16 @@ sudo mv jwx /usr/local/bin/
 ### Windows
 
 ```powershell
+choco install jwx
+```
+
+Or manually:
+
+```powershell
 Invoke-WebRequest -Uri "https://github.com/manimovassagh/jwx/releases/latest/download/jwx_windows_amd64.zip" -OutFile "$env:TEMP\jwx.zip"
 Expand-Archive "$env:TEMP\jwx.zip" -DestinationPath "$env:LOCALAPPDATA\jwx" -Force
 $env:PATH += ";$env:LOCALAPPDATA\jwx"
 ```
-
-Or download `.exe` from [Releases](https://github.com/manimovassagh/jwx/releases/latest) and add to your `PATH`.
 
 ### :wrench: From Source
 

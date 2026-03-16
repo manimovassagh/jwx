@@ -29,9 +29,9 @@ var SupportedAlgorithms = []string{
 // SignOptions holds the parameters for signing a JWT.
 type SignOptions struct {
 	Algorithm string
-	Secret    string // For HMAC algorithms
-	KeyFile   string // For RSA/EC/EdDSA algorithms
-	Claims    string // JSON string of claims
+	Secret    string         // For HMAC algorithms
+	KeyFile   string         // For RSA/EC/EdDSA algorithms
+	Claims    string         // JSON string of claims
 	Header    map[string]any // Extra header fields
 }
 

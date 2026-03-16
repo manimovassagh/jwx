@@ -40,7 +40,7 @@ func runDecode(cmd *cobra.Command, args []string) error {
 		tokenStr = args[0]
 	} else {
 		// Check if stdin has data
-		if isatty.IsTerminal(os.Stdin.Fd()) && isatty.IsCygwinTerminal(os.Stdin.Fd()) == false {
+		if isatty.IsTerminal(os.Stdin.Fd()) && !isatty.IsCygwinTerminal(os.Stdin.Fd()) {
 			return fmt.Errorf("no token provided\n\nUsage: jwx decode <token>\n       echo <token> | jwx decode")
 		}
 		scanner := bufio.NewScanner(os.Stdin)

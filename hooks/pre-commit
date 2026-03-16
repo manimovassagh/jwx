@@ -1,0 +1,26 @@
+#!/bin/sh
+# Pre-commit hook: fmt + lint
+
+set -e
+
+echo "▸ Running gofmt..."
+UNFMT=$(gofmt -l . 2>&1 | grep -v vendor || true)
+if [ -n "$UNFMT" ]; then
+    echo "✗ Files not formatted:"
+    echo "$UNFMT"
+    echo ""
+    echo "Run: gofmt -w ."
+    exit 1
+fi
+echo "  ✓ All files formatted"
+
+echo "▸ Running go vet..."
+go vet ./...
+echo "  ✓ go vet passed"
+
+echo "▸ Running golangci-lint..."
+golangci-lint run --timeout 60s
+echo "  ✓ golangci-lint passed"
+
+echo ""
+echo "✓ All checks passed"

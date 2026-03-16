@@ -32,7 +32,7 @@ var (
 	titleStyle = lipgloss.NewStyle().
 			Bold(true)
 
-	headerTitle = titleStyle.Foreground(lipgloss.Color("63"))
+	headerTitle  = titleStyle.Foreground(lipgloss.Color("63"))
 	payloadTitle = titleStyle.Foreground(lipgloss.Color("42"))
 	sigTitle     = titleStyle.Foreground(lipgloss.Color("214"))
 

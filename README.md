@@ -13,40 +13,34 @@
 
 **jwx** decodes, signs, verifies, and audits JWTs — with beautiful, colorized terminal output.
 
-```
-$ jwx decode eyJhbGciOiJIUzI1NiIs...
+<p align="center">
+  <img src="docs/assets/demo.gif" alt="jwx demo" width="800">
+</p>
 
-╭────────────────╮
-│ Header         │
-│   alg: "HS256" │
-│   typ: "JWT"   │
-╰────────────────╯
-╭───────────────────────────────────────────╮
-│ Payload                                   │
-│   sub: "1234567890"                       │
-│   exp: 1900000000  (2030-03-17T17:46:40Z) │
-│        ✓ Expires 4 years from now         │
-│   iat: 1516239022  (2018-01-18T01:30:22Z) │
-│   name: "John Doe"                        │
-╰───────────────────────────────────────────╯
-╭─────────────────────────────────────────────╮
-│ Signature                                   │
-│   Algorithm: "HS256"                        │
-│   Status: Not verified (no key provided)    │
-╰─────────────────────────────────────────────╯
-```
+> **Try it in your browser**: [manimovassagh.github.io/jwx](https://manimovassagh.github.io/jwx/)
 
 ## Install
 
 ```bash
-# Go
+# Go (recommended)
 go install github.com/manimovassagh/jwx/cmd/jwx@latest
 
-# Homebrew (coming soon)
+# Homebrew (macOS/Linux)
 brew install manimovassagh/tap/jwx
 
-# Or download a binary from Releases
+# Download binary (Linux, macOS, Windows)
+# → https://github.com/manimovassagh/jwx/releases/latest
 ```
+
+### Other platforms
+
+| Platform | Command |
+|----------|---------|
+| **Go** | `go install github.com/manimovassagh/jwx/cmd/jwx@latest` |
+| **Homebrew** | `brew install manimovassagh/tap/jwx` |
+| **Binary** | Download from [Releases](https://github.com/manimovassagh/jwx/releases/latest) |
+| **Docker** | `docker run --rm ghcr.io/manimovassagh/jwx decode <token>` |
+| **From source** | `git clone && make install` |
 
 ## Shell Completions
 

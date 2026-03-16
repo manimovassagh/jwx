@@ -1,6 +1,6 @@
 <p align="center">
   <h1 align="center">jwx</h1>
-  <p align="center">A beautiful CLI for working with JSON Web Tokens</p>
+  <p align="center"><strong>Decode JWTs instantly. No browser, no server, no nonsense.</strong></p>
   <p align="center">
     <a href="https://github.com/manimovassagh/jwx/actions/workflows/ci.yml"><img src="https://github.com/manimovassagh/jwx/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
     <a href="https://goreportcard.com/report/github.com/manimovassagh/jwx"><img src="https://goreportcard.com/badge/github.com/manimovassagh/jwx" alt="Go Report Card"></a>
@@ -9,107 +9,67 @@
   </p>
 </p>
 
----
-
-**jwx** decodes, signs, verifies, and audits JWTs — with beautiful, colorized terminal output.
-
 <p align="center">
   <img src="docs/assets/jwx-demo.gif" alt="jwx demo" width="800">
 </p>
 
-> **Try it in your browser**: [manimovassagh.github.io/jwx](https://manimovassagh.github.io/jwx/)
+<p align="center">
+  <a href="https://manimovassagh.github.io/jwx/"><img src="https://img.shields.io/badge/%F0%9F%8C%90%20Try%20it%20in%20your%20browser-blue?style=for-the-badge" alt="Try it in your browser"></a>
+</p>
+
+## Why jwx?
+
+- **Just paste and go** -- no subcommands needed for the common case. Run `jwx <token>` and you're done.
+- **Beautiful output** -- colorized rounded boxes with human-readable timestamps, not a raw JSON dump.
+- **Privacy first** -- tokens are decoded locally on your machine. Nothing is ever sent to a server.
+- **Pipe-friendly** -- reads from stdin, supports `--json` for scripting with `jq`.
 
 ## Install
 
-> **Works everywhere:** If you have Go 1.21+, the fastest way to install on any platform:
->
-> ```bash
-> go install github.com/manimovassagh/jwx/cmd/jwx@latest
-> ```
-
-### macOS
-
-**Homebrew** (recommended):
+### :apple: macOS
 
 ```bash
 brew install manimovassagh/tap/jwx
 ```
 
-Or with Go:
+### :penguin: Linux
 
 ```bash
-go install github.com/manimovassagh/jwx/cmd/jwx@latest
-```
-
-### Linux
-
-**Go install:**
-
-```bash
-go install github.com/manimovassagh/jwx/cmd/jwx@latest
-```
-
-**Pre-built binary:**
-
-```bash
-# Download the latest release for your architecture
 curl -sL https://github.com/manimovassagh/jwx/releases/latest/download/jwx_linux_amd64.tar.gz | tar xz
 sudo mv jwx /usr/local/bin/
 ```
 
-> **Snap / APT** — coming soon.
+### :window: Windows
 
-### Windows
+Download `.exe` from [Releases](https://github.com/manimovassagh/jwx/releases/latest) and add to your `PATH`.
 
-**Go install:**
+### :wrench: From Source
 
-```powershell
+```bash
 go install github.com/manimovassagh/jwx/cmd/jwx@latest
 ```
 
-**Pre-built binary:** download `.exe` from [Releases](https://github.com/manimovassagh/jwx/releases/latest) and add to your `PATH`.
-
-> **Scoop** — coming soon.
-
-### From Source
+Or clone and build:
 
 ```bash
-git clone https://github.com/manimovassagh/jwx.git
-cd jwx
-make build
-make install
-```
-
-## Shell Completions
-
-```bash
-# Bash
-jwx completion bash > /etc/bash_completion.d/jwx
-
-# Zsh
-jwx completion zsh > "${fpath[1]}/_jwx"
-
-# Fish
-jwx completion fish > ~/.config/fish/completions/jwx.fish
-
-# PowerShell
-jwx completion powershell | Out-String | Invoke-Expression
+git clone https://github.com/manimovassagh/jwx.git && cd jwx
+make build && make install
 ```
 
 ## Quick Start
 
 ```bash
-# Decode any JWT with colorized output
-jwx decode eyJhbGciOiJIUzI1NiIs...
+# The simplest way -- just paste a token
+jwx eyJhbGciOiJIUzI1NiIs...
 
-# Pipe from clipboard or stdin
-pbpaste | jwx decode
+# Pipe from clipboard or another command
+pbpaste | jwx
 
 # Sign a new token
 jwx sign --alg HS256 --secret mykey '{"sub":"1234","role":"admin"}'
 
-# Machine-readable output for scripts
-jwx decode --json eyJhbGci... | jq .payload.sub
+# Machine-readable JSON for scripts
+jwx --json eyJhbGci... | jq .payload.sub
 ```
 
 ## Features
@@ -119,9 +79,9 @@ jwx decode --json eyJhbGci... | jq .payload.sub
 | **Decode** | Beautiful colorized output with rounded boxes |
 | **Sign** | Create tokens with HMAC, RSA, ECDSA, EdDSA |
 | **Timestamps** | Auto-converts to human-readable + relative time |
-| **Expiry Detection** | `⚠ EXPIRED 2 hours ago` / `✓ Expires in 3 days` |
+| **Expiry Detection** | `EXPIRED 2 hours ago` / `Expires in 3 days` |
 | **JSON Mode** | `--json` flag for piping to `jq` and scripts |
-| **Stdin** | Pipe tokens via stdin (`pbpaste \| jwx decode`) |
+| **Stdin** | Pipe tokens via stdin (`pbpaste \| jwx`) |
 | **No Color** | Respects `NO_COLOR` env var and `--no-color` flag |
 | **Exit Codes** | Scriptable: 0=ok, 1=invalid, 2=expired |
 
@@ -144,34 +104,38 @@ jwx decode --json eyJhbGci... | jq .payload.sub
 | `3` | Signature verification failed |
 | `4` | Key error (file not found, wrong format) |
 
+## Shell Completions
+
+```bash
+jwx completion bash > /etc/bash_completion.d/jwx   # Bash
+jwx completion zsh > "${fpath[1]}/_jwx"             # Zsh
+jwx completion fish > ~/.config/fish/completions/jwx.fish  # Fish
+jwx completion powershell | Out-String | Invoke-Expression # PowerShell
+```
+
 ## Roadmap
 
-- [x] `jwx decode` — beautiful token decoding
-- [x] `jwx sign` — create and sign tokens
-- [ ] `jwx verify` — verify token signatures (JWKS support)
-- [ ] `jwx inspect` — deep token analysis
-- [ ] `jwx audit` — security vulnerability checks
-- [ ] `jwx keygen` — generate key pairs
-- [ ] Claude Code plugin
+- [x] `jwx decode` -- beautiful token decoding
+- [x] `jwx sign` -- create and sign tokens
+- [ ] Clipboard support (`jwx --clipboard`)
+- [ ] `jwx verify` -- verify token signatures (JWKS support)
+- [ ] `jwx inspect` -- deep token analysis
+- [ ] `jwx audit` -- security vulnerability checks
+- [ ] `jwx keygen` -- generate key pairs
 
 ## Contributing
 
-Contributions are welcome! Please open an issue or submit a pull request.
+Contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
-```bash
-# Clone
-git clone https://github.com/manimovassagh/jwx.git
-cd jwx
+## Star History
 
-# Build
-make build
-
-# Test
-make test
-
-# Install locally
-make install
-```
+<a href="https://star-history.com/#manimovassagh/jwx&Date">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=manimovassagh/jwx&type=Date&theme=dark" />
+    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=manimovassagh/jwx&type=Date" />
+    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=manimovassagh/jwx&type=Date" width="600" />
+  </picture>
+</a>
 
 ## License
 

@@ -13,6 +13,10 @@
   <a href="https://manimovassagh.github.io/jwx/">
     <img src="https://img.shields.io/badge/%F0%9F%94%91_Try_it_in_your_browser-6d5dfc?style=for-the-badge&logoColor=white&labelColor=0c0c0f" alt="Try jwx in your browser" height="48">
   </a>
+  &nbsp;&nbsp;
+  <a href="https://manimovassagh.github.io/jwx/docs/">
+    <img src="https://img.shields.io/badge/%F0%9F%93%96_Documentation-22c55e?style=for-the-badge&logoColor=white&labelColor=0c0c0f" alt="Documentation" height="48">
+  </a>
 </p>
 <p align="center"><sub>No install needed — decode JWTs instantly, 100% client-side</sub></p>
 

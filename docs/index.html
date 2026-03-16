@@ -323,7 +323,14 @@ footer{
       <div class="btn-row">
         <button class="btn-sm btn-decode" onclick="decode()">Decode</button>
         <button class="btn-sm btn-clear" onclick="clearAll()">Clear</button>
-        <button class="btn-sm btn-sample" onclick="loadSample()">Sample Token</button>
+        <select class="btn-sm btn-sample" onchange="loadSample(this.value); this.selectedIndex=0;" style="cursor:pointer;appearance:auto;padding-right:24px">
+          <option value="" disabled selected>Try a Sample...</option>
+          <option value="basic">Basic HS256</option>
+          <option value="rich">RS256 with claims</option>
+          <option value="expired">Expired token</option>
+          <option value="admin">Admin + roles</option>
+          <option value="oauth">OAuth2 access token</option>
+        </select>
       </div>
     </div>
 
@@ -432,10 +439,17 @@ footer{
   input.addEventListener('paste', function(){ setTimeout(decode, 10); });
 })();
 
-var SAMPLE_JWT = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImtleS0xIn0.eyJzdWIiOiJ1c2VyXzQyIiwibmFtZSI6IkFsaWNlIEpvaG5zb24iLCJlbWFpbCI6ImFsaWNlQGV4YW1wbGUuY29tIiwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzAwMDAwMDAwLCJleHAiOjE3MDAwODY0MDAsIm5iZiI6MTcwMDAwMDAwMCwiaXNzIjoiaHR0cHM6Ly9hdXRoLmV4YW1wbGUuY29tIiwiYXVkIjoiaHR0cHM6Ly9hcGkuZXhhbXBsZS5jb20ifQ.signature_placeholder';
+var SAMPLES = {
+  basic: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c',
+  rich: 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImFiYzEyMyJ9.eyJpc3MiOiJodHRwczovL2F1dGguZXhhbXBsZS5jb20iLCJzdWIiOiJ1c2VyXzQyIiwiYXVkIjoiYXBpLmV4YW1wbGUuY29tIiwibmFtZSI6Ik1hbmkgTW92YXNzYWdoIiwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzEwNjAwMDAwLCJleHAiOjE5MDAwMDAwMDB9.fakesig',
+  expired: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwiZXhwIjoxNTE2MjM5MDIyfQ.4lKlMEaOmgSFB2ACmiTVsEL6L-5hAeTnjIPAhCMKBFE',
+  admin: 'eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbl8xIiwicm9sZXMiOlsiYWRtaW4iLCJzdXBlcl9hZG1pbiJdLCJwZXJtaXNzaW9ucyI6WyJyZWFkIiwid3JpdGUiLCJkZWxldGUiLCJtYW5hZ2VfdXNlcnMiXSwib3JnIjoiYWNtZS1jb3JwIiwiaWF0IjoxNzEwNjAwMDAwLCJleHAiOjE5MDAwMDAwMDB9.fakesig',
+  oauth: 'eyJhbGciOiJSUzI1NiIsInR5cCI6ImF0K2p3dCIsImtpZCI6InNpZy0xIn0.eyJpc3MiOiJodHRwczovL2lkcC5leGFtcGxlLmNvbSIsInN1YiI6InVzZXJfNDIiLCJhdWQiOiJodHRwczovL2FwaS5leGFtcGxlLmNvbSIsImNsaWVudF9pZCI6IndlYi1hcHAiLCJzY29wZSI6Im9wZW5pZCBwcm9maWxlIGVtYWlsIiwiaWF0IjoxNzEwNjAwMDAwLCJleHAiOjE5MDAwMDAwMDAsImp0aSI6ImE4ZjVmMTY3LTRiMjMtNGE5OC1iN2M2LTlkZjJlMzQ1Njc4OSJ9.fakesig'
+};
 
-function loadSample(){
-  document.getElementById('jwt-input').value = SAMPLE_JWT;
+function loadSample(key){
+  if(!key) return;
+  document.getElementById('jwt-input').value = SAMPLES[key];
   decode();
 }
 

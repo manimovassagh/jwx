@@ -9,6 +9,12 @@ on:
     secrets:
       CHOCOLATEY_API_KEY:
         required: true
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to publish (without v prefix, e.g. 1.2.3)"
+        required: true
+        type: string
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
@@ -30,6 +36,39 @@ jobs:
           Invoke-WebRequest -Uri $url -OutFile jwx.zip
           Expand-Archive jwx.zip -DestinationPath tools
 
+      - name: Create VERIFICATION.txt
+        env:
+          VERSION: ${{ inputs.version }}
+          REPO: ${{ github.repository }}
+        run: |
+          @"
+          VERIFICATION
+
+          Verification is intended to assist the Chocolatey moderators and community in
+          verifying that this package's contents are trustworthy.
+
+          The embedded software has been built from source by the package maintainer and
+          is available for public download.
+
+          1. Download the official release from:
+             https://github.com/${env:REPO}/releases/download/v${env:VERSION}/jwx_${env:VERSION}_windows_amd64.zip
+
+          2. Extract the zip and compare the jwx.exe binary with the one in the tools directory.
+             You can use Get-FileHash to compare SHA256 checksums:
+               Get-FileHash tools\jwx.exe -Algorithm SHA256
+               Get-FileHash <downloaded>\jwx.exe -Algorithm SHA256
+
+          3. The project source code is available at:
+             https://github.com/${env:REPO}
+
+          4. The binary is built via GitHub Actions using GoReleaser.
+             Build workflow: https://github.com/${env:REPO}/blob/main/.github/workflows/release.yml
+
+          LICENSE
+          The software is licensed under the MIT License.
+          Full license text: https://github.com/${env:REPO}/blob/main/LICENSE
+          "@ | Out-File -Encoding utf8 tools\VERIFICATION.txt
+
       - name: Create nuspec
         env:
           VERSION: ${{ inputs.version }}
@@ -47,7 +86,7 @@ jobs:
               <iconUrl>https://raw.githubusercontent.com/manimovassagh/jwx/main/docs/icon.png</iconUrl>
               <licenseUrl>https://github.com/manimovassagh/jwx/blob/main/LICENSE</licenseUrl>
               <requireLicenseAcceptance>false</requireLicenseAcceptance>
-              <projectSourceUrl>https://github.com/manimovassagh/jwx</projectSourceUrl>
+              <packageSourceUrl>https://github.com/manimovassagh/jwx/blob/main/.github/workflows/publish-choco.yml</packageSourceUrl>
               <docsUrl>https://github.com/manimovassagh/jwx#readme</docsUrl>
               <bugTrackerUrl>https://github.com/manimovassagh/jwx/issues</bugTrackerUrl>
               <tags>jwt json cli security token decode encode sign verify</tags>

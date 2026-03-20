@@ -83,7 +83,8 @@ jobs:
               <authors>Mani Movassagh</authors>
               <owners>manimovassagh</owners>
               <projectUrl>https://github.com/manimovassagh/jwx</projectUrl>
-              <iconUrl>https://raw.githubusercontent.com/manimovassagh/jwx/main/docs/icon.png</iconUrl>
+              <projectSourceUrl>https://github.com/manimovassagh/jwx</projectSourceUrl>
+              <iconUrl>https://raw.githubusercontent.com/manimovassagh/jwx/main/docs/assets/icon.png</iconUrl>
               <licenseUrl>https://github.com/manimovassagh/jwx/blob/main/LICENSE</licenseUrl>
               <requireLicenseAcceptance>false</requireLicenseAcceptance>
               <packageSourceUrl>https://github.com/manimovassagh/jwx/blob/main/.github/workflows/publish-choco.yml</packageSourceUrl>

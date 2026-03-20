@@ -4,6 +4,7 @@ node_modules/
 *.exe
 *.log
 *.png
+!docs/assets/icon.png
 *.jpg
 *.test
 .DS_Store

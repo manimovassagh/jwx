@@ -1,0 +1,14 @@
+# Default owner
+* @manimovassagh
+
+# CI/CD pipelines
+.github/ @manimovassagh
+
+# Web decoder
+docs/ @manimovassagh
+
+# Core JWT logic
+internal/ @manimovassagh
+
+# Documentation site
+website/ @manimovassagh

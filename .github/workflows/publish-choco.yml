@@ -33,8 +33,17 @@ jobs:
         run: |
           $tag = "v${env:VERSION}"
           $url = "https://github.com/${env:REPO}/releases/download/${tag}/jwx_${env:VERSION}_windows_amd64.zip"
-          Invoke-WebRequest -Uri $url -OutFile jwx.zip
-          Expand-Archive jwx.zip -DestinationPath tools
+          New-Item -ItemType Directory -Force -Path tools | Out-Null
+          Invoke-WebRequest -Uri $url -OutFile tools\jwx.zip
+
+      - name: Create chocolateyInstall.ps1
+        run: |
+          @"
+          `$ErrorActionPreference = 'Stop'
+          `$toolsDir = "`$(Split-Path -parent `$MyInvocation.MyCommand.Definition)"
+          `$zipFile  = Join-Path `$toolsDir 'jwx.zip'
+          Get-ChocolateyUnzip -FileFullPath `$zipFile -Destination `$toolsDir
+          "@ | Out-File -Encoding utf8 tools\chocolateyInstall.ps1
 
       - name: Create VERIFICATION.txt
         env:
@@ -53,10 +62,9 @@ jobs:
           1. Download the official release from:
              https://github.com/${env:REPO}/releases/download/v${env:VERSION}/jwx_${env:VERSION}_windows_amd64.zip
 
-          2. Extract the zip and compare the jwx.exe binary with the one in the tools directory.
-             You can use Get-FileHash to compare SHA256 checksums:
-               Get-FileHash tools\jwx.exe -Algorithm SHA256
-               Get-FileHash <downloaded>\jwx.exe -Algorithm SHA256
+          2. Compare the zip file with the one in the tools directory using SHA256:
+               Get-FileHash tools\jwx.zip -Algorithm SHA256
+               Get-FileHash <downloaded>\jwx_${env:VERSION}_windows_amd64.zip -Algorithm SHA256
 
           3. The project source code is available at:
              https://github.com/${env:REPO}

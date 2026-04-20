@@ -9,6 +9,12 @@ on:
     secrets:
       HOMEBREW_TAP_TOKEN:
         required: true
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to publish (without v prefix, e.g. 1.2.3)"
+        required: true
+        type: string
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true

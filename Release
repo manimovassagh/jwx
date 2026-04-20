@@ -1,0 +1,15 @@
+Origin: jwx
+Label: jwx
+Suite: stable
+Codename: stable
+Version: 1.3.1
+Architectures: amd64 arm64
+Components: main
+Description: APT repository for jwx - A beautiful CLI for working with JSON Web Tokens
+Date: Mon, 20 Apr 2026 19:28:14 +0000
+MD5Sum:
+ 90601ad7fac94422b8d01fd0411ad6b2 936 Packages
+ dc9ddbd2ba8efa29230ce479266c5dfd 504 Packages.gz
+SHA256:
+ 173777283823e453c050537d55c6a28bc1976eb2790e1dbe8fa074eb1bc29852 936 Packages
+ f1ad461a620f89db25074459a46777efc0c1a79331a12883611a95f325c2075b 504 Packages.gz

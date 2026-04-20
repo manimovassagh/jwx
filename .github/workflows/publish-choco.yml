@@ -36,6 +36,9 @@ jobs:
           New-Item -ItemType Directory -Force -Path tools | Out-Null
           Invoke-WebRequest -Uri $url -OutFile tools\jwx.zip
 
+      - name: Copy LICENSE.txt
+        run: Copy-Item LICENSE tools\LICENSE.txt
+
       - name: Create chocolateyInstall.ps1
         run: |
           @"
@@ -90,7 +93,7 @@ jobs:
               <title>jwx - JWT CLI Tool</title>
               <authors>Mani Movassagh</authors>
               <owners>manimovassagh</owners>
-              <projectUrl>https://github.com/manimovassagh/jwx</projectUrl>
+              <projectUrl>https://manimovassagh.github.io/jwx</projectUrl>
               <projectSourceUrl>https://github.com/manimovassagh/jwx</projectSourceUrl>
               <iconUrl>https://raw.githubusercontent.com/manimovassagh/jwx/main/docs/assets/icon.png</iconUrl>
               <licenseUrl>https://github.com/manimovassagh/jwx/blob/main/LICENSE</licenseUrl>
